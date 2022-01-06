@@ -12,7 +12,6 @@ Open the Git Bash command shell and run the following commands:
 git clone https://github.com/uink45/Light-Client-Server.git
 cd "./lodestar"
 yarn install
-yarn run build
 ```
 
 ### Running Server
