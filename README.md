@@ -10,7 +10,7 @@ This is a [Lodestar Beacon Chain Client](https://github.com/ChainSafe/lodestar) 
 Open the Git Bash command shell and run the following commands:
 ```
 git clone https://github.com/uink45/Light-Client-Server.git
-cd "./lodestar"
+cd "./Light-Client-Server"
 yarn install
 ```
 
