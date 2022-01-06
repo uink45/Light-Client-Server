@@ -1,0 +1,1 @@
+{"version":3,"file":"singleThread.d.ts","sourceRoot":"","sources":["../../../src/chain/bls/singleThread.ts"],"names":[],"mappings":"AAAA,OAAO,EAAC,aAAa,EAAC,MAAM,6CAA6C,CAAC;AAC1E,OAAO,EAAC,YAAY,EAAC,MAAM,aAAa,CAAC;AAIzC,qBAAa,uBAAwB,YAAW,YAAY;IACpD,mBAAmB,CAAC,IAAI,EAAE,aAAa,EAAE,GAAG,OAAO,CAAC,OAAO,CAAC;CASnE"}
