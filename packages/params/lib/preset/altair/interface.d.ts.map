@@ -1,0 +1,1 @@
+{"version":3,"file":"interface.d.ts","sourceRoot":"","sources":["../../../src/preset/altair/interface.ts"],"names":[],"mappings":"AAEA,MAAM,WAAW,aAAa;IAC5B,mBAAmB,EAAE,MAAM,CAAC;IAC5B,gCAAgC,EAAE,MAAM,CAAC;IACzC,kCAAkC,EAAE,MAAM,CAAC;IAC3C,oCAAoC,EAAE,MAAM,CAAC;IAC7C,uCAAuC,EAAE,MAAM,CAAC;CACjD"}

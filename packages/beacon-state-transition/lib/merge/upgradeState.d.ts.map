@@ -1,0 +1,1 @@
+{"version":3,"file":"upgradeState.d.ts","sourceRoot":"","sources":["../../src/merge/upgradeState.ts"],"names":[],"mappings":"AAAA,OAAO,EAAC,MAAM,EAAE,KAAK,EAAM,MAAM,2BAA2B,CAAC;AAC7D,OAAO,EAAC,iBAAiB,EAA0B,MAAM,kBAAkB,CAAC;AAI5E;;GAEG;AACH,wBAAgB,YAAY,CAAC,KAAK,EAAE,iBAAiB,CAAC,MAAM,CAAC,WAAW,CAAC,GAAG,iBAAiB,CAAC,KAAK,CAAC,WAAW,CAAC,CAK/G"}

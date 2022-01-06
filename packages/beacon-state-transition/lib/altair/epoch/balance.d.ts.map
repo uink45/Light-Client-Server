@@ -1,0 +1,1 @@
+{"version":3,"file":"balance.d.ts","sourceRoot":"","sources":["../../../src/altair/epoch/balance.ts"],"names":[],"mappings":"AAAA,OAAO,EAAW,MAAM,EAAC,MAAM,2BAA2B,CAAC;AAY3D,OAAO,EACL,iBAAiB,EAMjB,aAAa,EACd,MAAM,qBAAqB,CAAC;AAY7B;;;;;;;;;;;;GAYG;AACH,wBAAgB,yBAAyB,CACvC,KAAK,EAAE,iBAAiB,CAAC,MAAM,CAAC,WAAW,CAAC,EAC5C,OAAO,EAAE,aAAa,GACrB,CAAC,MAAM,EAAE,EAAE,MAAM,EAAE,CAAC,CAmFtB"}

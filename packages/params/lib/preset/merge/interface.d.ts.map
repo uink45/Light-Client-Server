@@ -1,0 +1,1 @@
+{"version":3,"file":"interface.d.ts","sourceRoot":"","sources":["../../../src/preset/merge/interface.ts"],"names":[],"mappings":"AAEA,MAAM,WAAW,YAAY;IAC3B,iCAAiC,EAAE,MAAM,CAAC;IAC1C,mCAAmC,EAAE,MAAM,CAAC;IAC5C,sCAAsC,EAAE,MAAM,CAAC;IAC/C,yBAAyB,EAAE,MAAM,CAAC;IAClC,4BAA4B,EAAE,MAAM,CAAC;IACrC,oBAAoB,EAAE,MAAM,CAAC;IAC7B,oBAAoB,EAAE,MAAM,CAAC;CAC9B"}
