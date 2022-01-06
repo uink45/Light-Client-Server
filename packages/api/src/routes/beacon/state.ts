@@ -270,10 +270,8 @@ export function getReturnTypes(): ReturnTypes<Api> {
 
   const EpochSyncCommitteesResponse = new ContainerType<EpochSyncCommitteeResponse>({
     fields: {
-      header: ssz.phase0.BeaconBlockHeader,
-      pubkeys: ArrayOf(ssz.BLSPubkey),
-      aggregatePubkey: ssz.BLSPubkey,
-      currentSyncCommitteeBranch: new VectorType({elementType: ssz.Root, length: 5}),
+      validators: ArrayOf(ssz.ValidatorIndex),
+      validatorAggregates: ArrayOf(ssz.ValidatorIndex),
     },
   });
 

@@ -450,7 +450,7 @@ export class LightClientServer {
     }
 
     // Check if this update is better, otherwise ignore
-    //await this.maybeStoreNewBestPartialUpdate(syncAggregate, attestedData);
+    await this.maybeStoreNewBestPartialUpdate(syncAggregate, attestedData);
   }
 
   /**
