@@ -3,8 +3,8 @@
 This is a Lodestar Beacon Chain Client that has been modified to serve REST-API requests from a light client.
 
 ### Requirements
-- Yarn - Installed via `npm install --global yarn`
-- Git Bash - [Download from here](https://git-scm.com/download/win)
+- Yarn - Installed via the command `npm install --global yarn`
+- Git Bash - [Download](https://git-scm.com/download/win)
 
 ### Instructions
 Open the Git Bash command shell and run the following commands:
