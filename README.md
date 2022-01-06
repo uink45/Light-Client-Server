@@ -9,7 +9,7 @@ This is a Lodestar Beacon Chain Client that has been modified to serve REST-API 
 ### Instructions
 Open the Git Bash command shell and run the following commands:
 ```
-git clone https://github.com/chainsafe/lodestar.git
+git clone https://github.com/uink45/Light-Client-Server.git
 cd "./lodestar"
 yarn install
 yarn run build
