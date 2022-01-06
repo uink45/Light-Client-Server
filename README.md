@@ -1,3 +1,5 @@
-# Light Client Server (Modified Version of Lodestar Beacon Chain Client)
+# Light Client Server 
 
-A light client server that fufills REST-API requests.
+This is a Lodestar Beacon Chain Client that has been modified to serve REST-API requests from a light client.
+
+## Instructions
