@@ -171,14 +171,16 @@ export function getBeaconStateApi({chain, config, db}: Pick<ApiModules, "chain" 
       if (stateEpoch < config.ALTAIR_FORK_EPOCH) {
         throw new ApiError(400, "Requested state before ALTAIR_FORK_EPOCH");
       }
-
+      const proofs = await chain.lightClientServer.getCurrentSyncCommitteeProof(state);
+      state.latestBlockHeader.stateRoot = state.hashTreeRoot();
       return {
-        data: {
-          validators: getSyncCommittees(state, epoch ?? stateEpoch),
-          // TODO: This is not used by the validator and will be deprecated soon
-          validatorAggregates: [],
-        },
-      };
+            data: {
+                header: state.latestBlockHeader,
+                pubkeys: state.currentSyncCommittee.pubkeys,
+                aggregatePubkey: state.currentSyncCommittee.aggregatePubkey,
+                currentSyncCommitteeBranch: proofs,
+            },
+        };
     },
   };
 }
