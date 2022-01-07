@@ -43,7 +43,9 @@ async function initAndVerifyWeakSubjectivityState(config, db, logger, store, wsS
     if (!lodestar_beacon_state_transition_1.allForks.isWithinWeakSubjectivityPeriod(config, anchorState, anchorCheckpoint)) {
         throw new Error("Fetched weak subjectivity checkpoint not within weak subjectivity period.");
     }
-    return await (0, lodestar_1.initStateFromAnchorState)(config, db, logger, anchorState);
+    anchorState = await (0, lodestar_1.initStateFromAnchorState)(config, db, logger, anchorState);
+    // Return the latest anchorState but still return original wsCheckpoint to validate in backfill
+    return { anchorState, wsCheckpoint };
 }
 /**
  * Initialize a beacon state, picking the strategy based on the `IBeaconArgs`
@@ -95,18 +97,21 @@ async function initBeaconState(options, args, chainForkConfig, db, logger, signa
     else if (lastDbState) {
         // start the chain from the latest stored state in the db
         const config = (0, lodestar_config_1.createIBeaconConfig)(chainForkConfig, lastDbState.genesisValidatorsRoot);
-        return await (0, lodestar_1.initStateFromAnchorState)(config, db, logger, lastDbState);
+        const anchorState = await (0, lodestar_1.initStateFromAnchorState)(config, db, logger, lastDbState);
+        return { anchorState };
     }
     else {
         const genesisStateFile = args.genesisStateFile || (0, networks_1.getGenesisFileUrl)(args.network || globalOptions_1.defaultNetwork);
         if (genesisStateFile && !args.forceGenesis) {
             const stateBytes = await (0, util_1.downloadOrLoadFile)(genesisStateFile);
-            const anchorState = (0, multifork_1.getStateTypeFromBytes)(chainForkConfig, stateBytes).createTreeBackedFromBytes(stateBytes);
+            let anchorState = (0, multifork_1.getStateTypeFromBytes)(chainForkConfig, stateBytes).createTreeBackedFromBytes(stateBytes);
             const config = (0, lodestar_config_1.createIBeaconConfig)(chainForkConfig, anchorState.genesisValidatorsRoot);
-            return await (0, lodestar_1.initStateFromAnchorState)(config, db, logger, anchorState);
+            anchorState = await (0, lodestar_1.initStateFromAnchorState)(config, db, logger, anchorState);
+            return { anchorState };
         }
         else {
-            return await (0, lodestar_1.initStateFromEth1)({ config: chainForkConfig, db, logger, opts: options.eth1, signal });
+            const anchorState = await (0, lodestar_1.initStateFromEth1)({ config: chainForkConfig, db, logger, opts: options.eth1, signal });
+            return { anchorState };
         }
     }
 }

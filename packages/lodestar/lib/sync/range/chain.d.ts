@@ -104,6 +104,7 @@ export declare class SyncChain {
      * Helper to print internal state for debugging when chain gets stuck
      */
     getBatchesState(): BatchMetadata[];
+    get startEpochValue(): Epoch;
     get isSyncing(): boolean;
     get isRemovable(): boolean;
     get peers(): number;

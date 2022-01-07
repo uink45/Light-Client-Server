@@ -28,6 +28,7 @@ class BeaconDb extends lodestar_db_1.DatabaseService {
         this.checkpointHeader = new repositories_1.CheckpointHeaderRepository(this.config, this.db, this.metrics);
         this.syncCommittee = new repositories_1.SyncCommitteeRepository(this.config, this.db, this.metrics);
         this.syncCommitteeWitness = new repositories_1.SyncCommitteeWitnessRepository(this.config, this.db, this.metrics);
+        this.backfilledRanges = new repositories_1.BackfilledRanges(this.config, this.db, this.metrics);
     }
     async stop() {
         await super.stop();

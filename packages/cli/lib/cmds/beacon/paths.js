@@ -31,6 +31,7 @@ function getBeaconPaths(args) {
     const peerIdFile = args.peerIdFile || path_1.default.join(beaconDir, "peer-id.json");
     const enrFile = args.enrFile || path_1.default.join(beaconDir, "enr");
     const logFile = args.logFile;
+    const bootnodesFile = args.bootnodesFile;
     return {
         ...globalPaths,
         beaconDir,
@@ -41,6 +42,7 @@ function getBeaconPaths(args) {
         peerIdFile,
         enrFile,
         logFile,
+        bootnodesFile,
     };
 }
 exports.getBeaconPaths = getBeaconPaths;

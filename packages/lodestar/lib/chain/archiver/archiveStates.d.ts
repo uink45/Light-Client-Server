@@ -2,6 +2,7 @@
  * @module tasks
  */
 import { ILogger } from "@chainsafe/lodestar-utils";
+import { Slot } from "@chainsafe/lodestar-types";
 import { IBeaconDb } from "../../db";
 import { CheckpointStateCache } from "../stateCache";
 import { CheckpointWithHex } from "@chainsafe/lodestar-fork-choice";
@@ -31,7 +32,7 @@ export declare class StatesArchiver {
      * epoch - 1024*2    epoch - 1024    epoch - 32    epoch
      * ```
      */
-    maybeArchiveState(finalized: CheckpointWithHex): Promise<void>;
+    maybeArchiveState(finalized: CheckpointWithHex, anchorSlot: Slot): Promise<void>;
     /**
      * Archives finalized states from active bucket to archive bucket.
      * Only the new finalized state is stored to disk

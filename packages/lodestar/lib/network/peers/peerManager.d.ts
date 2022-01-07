@@ -63,7 +63,6 @@ export declare class PeerManager {
     private connectedPeers;
     private opts;
     private intervals;
-    private seenPeers;
     constructor(modules: PeerManagerModules, opts: PeerManagerOpts);
     start(): Promise<void>;
     stop(): Promise<void>;

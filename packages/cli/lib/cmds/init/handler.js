@@ -25,6 +25,7 @@ async function initializeOptionsAndConfig(args) {
     const beaconNodeOptions = new config_1.BeaconNodeOptions({
         network: args.network || "mainnet",
         configFile: beaconPaths.configFile,
+        bootnodesFile: beaconPaths.bootnodesFile,
         beaconNodeOptionsCli: (0, options_1.parseBeaconNodeArgs)(args),
     });
     // Auto-setup network

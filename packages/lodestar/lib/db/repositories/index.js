@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SyncCommitteeWitnessRepository = exports.SyncCommitteeRepository = exports.CheckpointHeaderRepository = exports.BestPartialLightClientUpdateRepository = exports.Eth1DataRepository = exports.DepositDataRootRepository = exports.DepositEventRepository = exports.VoluntaryExitRepository = exports.ProposerSlashingRepository = exports.AttesterSlashingRepository = exports.StateArchiveRepository = exports.BlockArchiveRepository = exports.BlockRepository = void 0;
+exports.BackfilledRanges = exports.SyncCommitteeWitnessRepository = exports.SyncCommitteeRepository = exports.CheckpointHeaderRepository = exports.BestPartialLightClientUpdateRepository = exports.Eth1DataRepository = exports.DepositDataRootRepository = exports.DepositEventRepository = exports.VoluntaryExitRepository = exports.ProposerSlashingRepository = exports.AttesterSlashingRepository = exports.StateArchiveRepository = exports.BlockArchiveRepository = exports.BlockRepository = void 0;
 var block_1 = require("./block");
 Object.defineProperty(exports, "BlockRepository", { enumerable: true, get: function () { return block_1.BlockRepository; } });
 var blockArchive_1 = require("./blockArchive");
@@ -27,4 +27,6 @@ var lightclientSyncCommittee_1 = require("./lightclientSyncCommittee");
 Object.defineProperty(exports, "SyncCommitteeRepository", { enumerable: true, get: function () { return lightclientSyncCommittee_1.SyncCommitteeRepository; } });
 var lightclientSyncCommitteeWitness_1 = require("./lightclientSyncCommitteeWitness");
 Object.defineProperty(exports, "SyncCommitteeWitnessRepository", { enumerable: true, get: function () { return lightclientSyncCommitteeWitness_1.SyncCommitteeWitnessRepository; } });
+var backfilledRanges_1 = require("./backfilledRanges");
+Object.defineProperty(exports, "BackfilledRanges", { enumerable: true, get: function () { return backfilledRanges_1.BackfilledRanges; } });
 //# sourceMappingURL=index.js.map

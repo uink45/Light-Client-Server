@@ -26,7 +26,8 @@ export declare enum Bucket {
     lightClient_syncCommittee = 52,
     lightClient_checkpointHeader = 53,
     lightClient_bestPartialLightClientUpdate = 54,
-    validator_metaData = 41
+    validator_metaData = 41,
+    backfilled_ranges = 42
 }
 export declare enum Key {
     chainHeight = 0,

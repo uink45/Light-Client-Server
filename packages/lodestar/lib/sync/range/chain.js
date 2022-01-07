@@ -113,6 +113,9 @@ class SyncChain {
     getBatchesState() {
         return (0, utils_1.toArr)(this.batches).map((batch) => batch.getMetadata());
     }
+    get startEpochValue() {
+        return this.startEpoch;
+    }
     get isSyncing() {
         return this.status === SyncChainStatus.Syncing;
     }
@@ -318,7 +321,7 @@ class SyncChain {
             for (const pendingBatch of this.batches.values()) {
                 if (pendingBatch.startEpoch < batch.startEpoch) {
                     this.logger.verbose("Batch validation error", { id: this.logId, ...pendingBatch.getMetadata() });
-                    pendingBatch.validationError(); // Throws after MAX_BATCH_PROCESSING_ATTEMPTS
+                    pendingBatch.validationError(res.err); // Throws after MAX_BATCH_PROCESSING_ATTEMPTS
                 }
             }
         }

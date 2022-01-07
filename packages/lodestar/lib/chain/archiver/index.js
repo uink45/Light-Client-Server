@@ -31,7 +31,7 @@ class Archiver {
                 this.logger.verbose("Start processing finalized checkpoint", { epoch: finalizedEpoch });
                 await (0, archiveBlocks_1.archiveBlocks)(this.db, this.chain.forkChoice, this.chain.lightClientServer, this.logger, finalized);
                 // should be after ArchiveBlocksTask to handle restart cleanly
-                await this.statesArchiver.maybeArchiveState(finalized);
+                await this.statesArchiver.maybeArchiveState(finalized, this.chain.anchorSlot);
                 await Promise.all([
                     this.chain.checkpointStateCache.pruneFinalized(finalizedEpoch),
                     this.chain.stateCache.deleteAllBeforeEpoch(finalizedEpoch),

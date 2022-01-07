@@ -49,7 +49,7 @@ function getReturnTypes(config) {
     return {
         getDepositContract: (0, utils_1.ContainerData)(DepositContract),
         getForkSchedule: (0, utils_1.ContainerData)((0, utils_1.ArrayOf)(lodestar_types_1.ssz.phase0.Fork)),
-        getSpec: withJsonFilled(exports.Spec, lodestar_config_1.ChainConfig.toJson(config)),
+        getSpec: withJsonFilled(exports.Spec, exports.Spec.toJson({ ...config, ...lodestar_params_1.activePreset })),
     };
 }
 exports.getReturnTypes = getReturnTypes;

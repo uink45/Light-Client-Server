@@ -229,6 +229,9 @@ class Network {
     reStatusPeers(peers) {
         this.peerManager.reStatusPeers(peers);
     }
+    reportPeer(peer, action, actionName) {
+        this.peerRpcScores.applyAction(peer, action, actionName);
+    }
     /**
      * Subscribe to all gossip events. Safe to call multiple times
      */

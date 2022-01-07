@@ -29,6 +29,8 @@ export interface IBeaconChain {
     readonly eth1: IEth1ForBlockProduction;
     readonly executionEngine: IExecutionEngine;
     readonly config: IBeaconConfig;
+    /** The initial slot that the chain is started with */
+    readonly anchorSlot: Slot;
     bls: IBlsVerifier;
     forkChoice: IForkChoice;
     clock: IBeaconClock;

@@ -39,7 +39,6 @@ class PeerManager {
         // A single map of connected peers with all necessary data to handle PINGs, STATUS, and metrics
         this.connectedPeers = new Map();
         this.intervals = [];
-        this.seenPeers = new Set();
         /**
          * Must be called when network ReqResp receives incoming requests
          */
@@ -96,7 +95,6 @@ class PeerManager {
             this.logger.verbose("peer connected", { peer: (0, util_1.prettyPrintPeerId)(peer), direction, status });
             // NOTE: The peerConnect event is not emitted here here, but after asserting peer relevance
             (_a = this.metrics) === null || _a === void 0 ? void 0 : _a.peerConnectedEvent.inc({ direction });
-            this.seenPeers.add(peer.toB58String());
         };
         /**
          * The libp2p Upgrader has ended a connection
@@ -436,7 +434,6 @@ class PeerManager {
             }
         }
         metrics.peers.set(total);
-        metrics.peersTotalUniqueConnected.set(this.seenPeers.size);
         metrics.peersSync.set(syncPeers);
     }
 }

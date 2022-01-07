@@ -37,9 +37,19 @@ class StatesArchiver {
      * epoch - 1024*2    epoch - 1024    epoch - 32    epoch
      * ```
      */
-    async maybeArchiveState(finalized) {
+    async maybeArchiveState(finalized, anchorSlot) {
         const lastStoredSlot = await this.db.stateArchive.lastKey();
         const lastStoredEpoch = (0, lodestar_beacon_state_transition_1.computeEpochAtSlot)(lastStoredSlot !== null && lastStoredSlot !== void 0 ? lastStoredSlot : 0);
+        // Mark the sequence in backfill db from finalized slot till anchor slot as filled
+        const finalizedState = this.checkpointStateCache.get(finalized);
+        if (!finalizedState) {
+            throw Error("No state in cache for finalized checkpoint state epoch #" + finalized.epoch);
+        }
+        await this.db.backfilledRanges.put(finalizedState.slot, anchorSlot);
+        // Clear previously marked sequence till anchorSlot, without touching backfill sync
+        // process sequence which are at <=anchorSlot i.e. clear >anchorSlot and < currentSlot
+        const filteredSeqs = await this.db.backfilledRanges.keys({ gt: anchorSlot, lt: finalizedState.slot });
+        await this.db.backfilledRanges.batchDelete(filteredSeqs);
         if (finalized.epoch - lastStoredEpoch > PERSIST_TEMP_STATE_EVERY_EPOCHS) {
             await this.archiveState(finalized);
             const storedEpochs = await this.db.stateArchive.keys({

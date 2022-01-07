@@ -17,6 +17,7 @@ exports.BeaconNode = exports.BeaconNodeStatus = void 0;
 const abort_controller_1 = require("@chainsafe/abort-controller");
 const network_1 = require("../network");
 const sync_1 = require("../sync");
+const backfill_1 = require("../sync/backfill");
 const chain_1 = require("../chain");
 const metrics_1 = require("../metrics");
 const api_1 = require("../api");
@@ -35,7 +36,7 @@ var BeaconNodeStatus;
  * eth2 ecosystem as well as systems for getting beacon node metadata.
  */
 class BeaconNode {
-    constructor({ opts, config, db, metrics, metricsServer, network, chain, api, restApi, sync, controller, }) {
+    constructor({ opts, config, db, metrics, metricsServer, network, chain, api, restApi, sync, backfillSync, controller, }) {
         this.opts = opts;
         this.config = config;
         this.metrics = metrics;
@@ -46,6 +47,7 @@ class BeaconNode {
         this.restApi = restApi;
         this.network = network;
         this.sync = sync;
+        this.backfillSync = backfillSync;
         this.controller = controller;
         this.status = BeaconNodeStatus.started;
     }
@@ -53,7 +55,7 @@ class BeaconNode {
      * Initialize a beacon node.  Initializes and `start`s the varied sub-component services of the
      * beacon node
      */
-    static async init({ opts, config, db, logger, libp2p, anchorState, metricsRegistries = [], }) {
+    static async init({ opts, config, db, logger, libp2p, anchorState, wsCheckpoint, metricsRegistries = [], }) {
         const controller = new abort_controller_1.AbortController();
         const signal = controller.signal;
         // start db if not already started
@@ -88,6 +90,17 @@ class BeaconNode {
             chain,
             metrics,
             network,
+            wsCheckpoint,
+            logger: logger.child(opts.logger.sync),
+        });
+        const backfillSync = await backfill_1.BackfillSync.init({
+            config,
+            db,
+            chain,
+            metrics,
+            network,
+            wsCheckpoint,
+            anchorState,
             logger: logger.child(opts.logger.sync),
         });
         const api = (0, api_1.getApi)(opts.api, {
@@ -127,6 +140,7 @@ class BeaconNode {
             api,
             restApi,
             sync,
+            backfillSync,
             controller,
         });
     }
@@ -134,9 +148,11 @@ class BeaconNode {
      * Stop beacon node and its sub-components.
      */
     async close() {
+        var _a;
         if (this.status === BeaconNodeStatus.started) {
             this.status = BeaconNodeStatus.closing;
             this.sync.close();
+            (_a = this.backfillSync) === null || _a === void 0 ? void 0 : _a.close();
             await this.network.stop();
             if (this.metricsServer)
                 await this.metricsServer.stop();

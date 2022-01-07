@@ -11,4 +11,5 @@ export { BestPartialLightClientUpdateRepository } from "./lightclientBestPartial
 export { CheckpointHeaderRepository } from "./lightclientCheckpointHeader";
 export { SyncCommitteeRepository } from "./lightclientSyncCommittee";
 export { SyncCommitteeWitnessRepository } from "./lightclientSyncCommitteeWitness";
+export { BackfilledRanges } from "./backfilledRanges";
 //# sourceMappingURL=index.d.ts.map

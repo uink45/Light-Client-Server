@@ -9,6 +9,7 @@ export interface IBeaconPaths {
     peerIdFile: string;
     enrFile: string;
     logFile?: string;
+    bootnodesFile?: string;
 }
 /**
  * Defines the path structure of the files relevant to the beacon node

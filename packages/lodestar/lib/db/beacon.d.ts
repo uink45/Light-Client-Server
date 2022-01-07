@@ -3,7 +3,7 @@
  */
 import { DatabaseService, IDatabaseApiOptions, IDbMetrics } from "@chainsafe/lodestar-db";
 import { IBeaconDb } from "./interface";
-import { AttesterSlashingRepository, BlockArchiveRepository, BlockRepository, DepositEventRepository, DepositDataRootRepository, Eth1DataRepository, ProposerSlashingRepository, StateArchiveRepository, VoluntaryExitRepository, BestPartialLightClientUpdateRepository, CheckpointHeaderRepository, SyncCommitteeRepository, SyncCommitteeWitnessRepository } from "./repositories";
+import { AttesterSlashingRepository, BlockArchiveRepository, BlockRepository, DepositEventRepository, DepositDataRootRepository, Eth1DataRepository, ProposerSlashingRepository, StateArchiveRepository, VoluntaryExitRepository, BestPartialLightClientUpdateRepository, CheckpointHeaderRepository, SyncCommitteeRepository, SyncCommitteeWitnessRepository, BackfilledRanges } from "./repositories";
 import { PreGenesisState, PreGenesisStateLastProcessedBlock } from "./single";
 export declare class BeaconDb extends DatabaseService implements IBeaconDb {
     metrics?: IDbMetrics;
@@ -22,6 +22,7 @@ export declare class BeaconDb extends DatabaseService implements IBeaconDb {
     checkpointHeader: CheckpointHeaderRepository;
     syncCommittee: SyncCommitteeRepository;
     syncCommitteeWitness: SyncCommitteeWitnessRepository;
+    backfilledRanges: BackfilledRanges;
     constructor(opts: IDatabaseApiOptions);
     stop(): Promise<void>;
 }

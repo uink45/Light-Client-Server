@@ -64,7 +64,7 @@ async function beaconHandler(args) {
     await db.start();
     // BeaconNode setup
     try {
-        const anchorState = await (0, initBeaconState_1.initBeaconState)(options, args, config, db, logger, abortController.signal);
+        const { anchorState, wsCheckpoint } = await (0, initBeaconState_1.initBeaconState)(options, args, config, db, logger, abortController.signal);
         const beaconConfig = (0, lodestar_config_1.createIBeaconConfig)(config, anchorState.genesisValidatorsRoot);
         const node = await lodestar_1.BeaconNode.init({
             opts: options,
@@ -73,6 +73,7 @@ async function beaconHandler(args) {
             logger,
             libp2p: await (0, lodestar_1.createNodeJsLibp2p)(peerId, options.network, { peerStoreDir: beaconPaths.peerStoreDir }),
             anchorState,
+            wsCheckpoint,
             metricsRegistries,
         });
         abortController.signal.addEventListener("abort", () => node.close(), { once: true });

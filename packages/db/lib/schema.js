@@ -65,6 +65,7 @@ var Bucket;
     Bucket[Bucket["lightClient_checkpointHeader"] = 53] = "lightClient_checkpointHeader";
     Bucket[Bucket["lightClient_bestPartialLightClientUpdate"] = 54] = "lightClient_bestPartialLightClientUpdate";
     Bucket[Bucket["validator_metaData"] = 41] = "validator_metaData";
+    Bucket[Bucket["backfilled_ranges"] = 42] = "backfilled_ranges";
 })(Bucket = exports.Bucket || (exports.Bucket = {}));
 var Key;
 (function (Key) {

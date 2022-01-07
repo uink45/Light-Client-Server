@@ -22,10 +22,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchWeakSubjectivityState = exports.fetchBootnodes = exports.getGenesisFileUrl = exports.getNetworkBeaconNodeOptions = exports.getNetworkBeaconParams = exports.networkNames = void 0;
-const got_1 = __importDefault(require("got"));
+exports.fetchWeakSubjectivityState = exports.enrsToNetworkConfig = exports.getInjectableBootEnrs = exports.parseBootnodesFile = exports.readBootnodes = exports.fetchBootnodes = exports.getGenesisFileUrl = exports.getNetworkBeaconNodeOptions = exports.getNetworkBeaconParams = exports.networkNames = void 0;
 // eslint-disable-next-line no-restricted-imports
 const multifork_1 = require("@chainsafe/lodestar/lib/util/multifork");
+const fs_1 = __importDefault(require("fs"));
+const got_1 = __importDefault(require("got"));
 const mainnet = __importStar(require("./mainnet"));
 const pyrmont = __importStar(require("./pyrmont"));
 const prater = __importStar(require("./prater"));
@@ -85,6 +86,54 @@ async function fetchBootnodes(network) {
     return enrs;
 }
 exports.fetchBootnodes = fetchBootnodes;
+/**
+ * Reads and parses a list of bootnodes for a network from a file.
+ */
+function readBootnodes(bootnodesFilePath) {
+    const bootnodesFile = fs_1.default.readFileSync(bootnodesFilePath, "utf8");
+    const bootnodes = parseBootnodesFile(bootnodesFile);
+    if (bootnodes.length === 0) {
+        throw new Error(`No bootnodes found on file ${bootnodesFilePath}`);
+    }
+    return bootnodes;
+}
+exports.readBootnodes = readBootnodes;
+/**
+ * Parses a file to get a list of bootnodes for a network.
+ * Bootnodes file is expected to contain bootnode ENR's concatenated by newlines, or commas for
+ * parsing plaintext, YAML, JSON and/or env files.
+ */
+function parseBootnodesFile(bootnodesFile) {
+    const enrs = [];
+    for (const line of bootnodesFile.trim().split(/\r?\n/)) {
+        for (const entry of line.split(",")) {
+            const sanitizedEntry = entry.replace(/['",[\]{}.]+/g, "").trim();
+            if (sanitizedEntry.includes("enr:-")) {
+                const parsedEnr = `enr:-${sanitizedEntry.split("enr:-")[1]}`;
+                enrs.push(parsedEnr);
+            }
+        }
+    }
+    return enrs;
+}
+exports.parseBootnodesFile = parseBootnodesFile;
+/**
+ * Parses a file to get a list of bootnodes for a network if given a valid path,
+ * and returns the bootnodes in an "injectable" network options format.
+ */
+function getInjectableBootEnrs(bootnodesFilepath) {
+    const bootEnrs = readBootnodes(bootnodesFilepath);
+    const injectableBootEnrs = enrsToNetworkConfig(bootEnrs);
+    return injectableBootEnrs;
+}
+exports.getInjectableBootEnrs = getInjectableBootEnrs;
+/**
+ * Given an array of bootnodes, returns them in an injectable format
+ */
+function enrsToNetworkConfig(enrs) {
+    return { network: { discv5: { bootEnrs: enrs } } };
+}
+exports.enrsToNetworkConfig = enrsToNetworkConfig;
 /**
  * Fetch weak subjectivity state from a remote beacon node
  */

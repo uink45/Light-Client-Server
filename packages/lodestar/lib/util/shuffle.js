@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.shuffle = void 0;
+exports.shuffleOne = exports.shuffle = void 0;
 /**
  * Randomize an array of items without mutation.
  * Note: Uses Math.random() as entropy source, use for non-critical stuff
@@ -14,4 +14,13 @@ function shuffle(arr) {
     return _arr;
 }
 exports.shuffle = shuffle;
+/**
+ * Return one random item from array
+ */
+function shuffleOne(arr) {
+    if (arr.length === 0)
+        return undefined;
+    return arr[Math.floor(Math.random() * arr.length)];
+}
+exports.shuffleOne = shuffleOne;
 //# sourceMappingURL=shuffle.js.map

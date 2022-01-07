@@ -9,9 +9,10 @@ export declare class BeaconNodeOptions {
      * - existing options file
      * - CLI flags
      */
-    constructor({ network, configFile, beaconNodeOptionsCli, }: {
+    constructor({ network, configFile, bootnodesFile, beaconNodeOptionsCli, }: {
         network?: NetworkName;
         configFile?: string;
+        bootnodesFile?: string;
         beaconNodeOptionsCli: RecursivePartial<IBeaconNodeOptions>;
     });
     /**

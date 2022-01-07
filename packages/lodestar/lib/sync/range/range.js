@@ -77,7 +77,7 @@ class RangeSync extends events_1.EventEmitter {
         };
         /** Convenience method for `SyncChain` */
         this.reportPeer = (peer, action, actionName) => {
-            this.network.peerRpcScores.applyAction(peer, action, actionName);
+            this.network.reportPeer(peer, action, actionName);
         };
         /** Convenience method for `SyncChain` */
         this.onSyncChainEnd = () => {

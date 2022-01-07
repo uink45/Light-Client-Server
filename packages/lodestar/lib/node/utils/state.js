@@ -6,10 +6,14 @@ const deposits_1 = require("./interop/deposits");
 const state_1 = require("./interop/state");
 const fs_1 = require("fs");
 const path_1 = require("path");
+const constants_1 = require("../../constants");
 async function initDevState(config, db, validatorCount, interopStateOpts) {
     const deposits = (0, deposits_1.interopDeposits)(config, lodestar_types_1.ssz.phase0.DepositDataRootList.defaultTreeBacked(), validatorCount);
     await storeDeposits(config, db, deposits);
     const state = (0, state_1.getInteropState)(config, interopStateOpts, deposits, await db.depositDataRoot.getTreeBacked(validatorCount - 1));
+    const block = config.getForkTypes(constants_1.GENESIS_SLOT).SignedBeaconBlock.defaultValue();
+    block.message.stateRoot = config.getForkTypes(state.slot).BeaconState.hashTreeRoot(state);
+    await db.blockArchive.add(block);
     return state;
 }
 exports.initDevState = initDevState;

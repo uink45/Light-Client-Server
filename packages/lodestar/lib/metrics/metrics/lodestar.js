@@ -62,10 +62,6 @@ function createLodestarMetrics(register, metadata, anchorState) {
             help: "Total number of goodbye sent, labeled by reason",
             labelNames: ["reason"],
         }),
-        peersTotalUniqueConnected: register.gauge({
-            name: "lodestar_peers_total_unique_connected",
-            help: "Total number of unique peers that have had a connection with",
-        }),
         peersRequestedToConnect: register.gauge({
             name: "lodestar_peers_requested_total_to_connect",
             help: "Priorization results total peers count requested to connect",
@@ -402,6 +398,29 @@ function createLodestarMetrics(register, metadata, anchorState) {
                 name: "lodestar_gossip_block_elappsed_time_till_processed",
                 help: "Time elappsed between block slot time and the time block processed",
                 buckets: [0.1, 1, 10],
+            }),
+        },
+        backfillSync: {
+            backfilledTillSlot: register.gauge({
+                name: "lodestar_backfill_till_slot",
+                help: "Current lowest backfilled slot",
+            }),
+            prevFinOrWsSlot: register.gauge({
+                name: "lodestar_backfill_prev_fin_or_ws_slot",
+                help: "Slot of previous finalized or wsCheckpoint block to be validated",
+            }),
+            totalBlocks: register.gauge({
+                name: "lodestar_backfill_sync_blocks_total",
+                help: "Total amount of backfilled blocks",
+                labelNames: ["method"],
+            }),
+            errors: register.gauge({
+                name: "lodestar_backfill_sync_errors_total",
+                help: "Total number of errors while backfilling",
+            }),
+            status: register.gauge({
+                name: "lodestar_backfill_sync_status",
+                help: "Current backfill syncing status: [Aborted, Pending, Syncing, Completed]",
             }),
         },
         // Validator monitoring

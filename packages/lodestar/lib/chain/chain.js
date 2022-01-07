@@ -47,6 +47,7 @@ class BeaconChain {
         this.logger = logger;
         this.metrics = metrics;
         this.genesisTime = anchorState.genesisTime;
+        this.anchorSlot = anchorState.slot;
         this.genesisValidatorsRoot = anchorState.genesisValidatorsRoot.valueOf();
         this.eth1 = eth1;
         this.executionEngine = executionEngine;

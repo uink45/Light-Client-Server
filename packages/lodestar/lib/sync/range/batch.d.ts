@@ -108,7 +108,7 @@ export declare class Batch {
     /**
      * AwaitingValidation -> AwaitingDownload
      */
-    validationError(): void;
+    validationError(err: Error): void;
     /**
      * AwaitingValidation -> Done
      */

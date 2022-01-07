@@ -6,12 +6,13 @@ import LibP2p from "libp2p";
 import { Registry } from "prom-client";
 import { TreeBacked } from "@chainsafe/ssz";
 import { IBeaconConfig } from "@chainsafe/lodestar-config";
-import { allForks } from "@chainsafe/lodestar-types";
+import { allForks, phase0 } from "@chainsafe/lodestar-types";
 import { ILogger } from "@chainsafe/lodestar-utils";
 import { Api } from "@chainsafe/lodestar-api";
 import { IBeaconDb } from "../db";
 import { INetwork } from "../network";
 import { IBeaconSync } from "../sync";
+import { BackfillSync } from "../sync/backfill";
 import { IBeaconChain } from "../chain";
 import { IMetrics, HttpMetricsServer } from "../metrics";
 import { RestApi } from "../api";
@@ -26,6 +27,7 @@ export interface IBeaconNodeModules {
     chain: IBeaconChain;
     api: Api;
     sync: IBeaconSync;
+    backfillSync: BackfillSync;
     metricsServer?: HttpMetricsServer;
     restApi?: RestApi;
     controller?: AbortController;
@@ -37,6 +39,7 @@ export interface IBeaconNodeInitModules {
     logger: ILogger;
     libp2p: LibP2p;
     anchorState: TreeBacked<allForks.BeaconState>;
+    wsCheckpoint?: phase0.Checkpoint;
     metricsRegistries?: Registry[];
 }
 export declare enum BeaconNodeStatus {
@@ -59,14 +62,15 @@ export declare class BeaconNode {
     api: Api;
     restApi?: RestApi;
     sync: IBeaconSync;
+    backfillSync: BackfillSync;
     status: BeaconNodeStatus;
     private controller?;
-    constructor({ opts, config, db, metrics, metricsServer, network, chain, api, restApi, sync, controller, }: IBeaconNodeModules);
+    constructor({ opts, config, db, metrics, metricsServer, network, chain, api, restApi, sync, backfillSync, controller, }: IBeaconNodeModules);
     /**
      * Initialize a beacon node.  Initializes and `start`s the varied sub-component services of the
      * beacon node
      */
-    static init<T extends BeaconNode = BeaconNode>({ opts, config, db, logger, libp2p, anchorState, metricsRegistries, }: IBeaconNodeInitModules): Promise<T>;
+    static init<T extends BeaconNode = BeaconNode>({ opts, config, db, logger, libp2p, anchorState, wsCheckpoint, metricsRegistries, }: IBeaconNodeInitModules): Promise<T>;
     /**
      * Stop beacon node and its sub-components.
      */

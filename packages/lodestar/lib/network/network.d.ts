@@ -16,7 +16,7 @@ import { IReqResp, IReqRespOptions, ReqRespHandlers } from "./reqresp";
 import { Eth2Gossipsub, GossipHandlers } from "./gossip";
 import { MetadataController } from "./metadata";
 import { IPeerMetadataStore } from "./peers/metastore";
-import { IPeerRpcScoreStore } from "./peers";
+import { IPeerRpcScoreStore, PeerAction } from "./peers";
 import { INetworkEventBus } from "./events";
 import { AttnetsService, SyncnetsService, CommitteeSubscription } from "./subnets";
 interface INetworkModules {
@@ -67,6 +67,7 @@ export declare class Network implements INetwork {
      * The app layer needs to refresh the status of some peers. The sync have reached a target
      */
     reStatusPeers(peers: PeerId[]): void;
+    reportPeer(peer: PeerId, action: PeerAction, actionName?: string): void;
     /**
      * Subscribe to all gossip events. Safe to call multiple times
      */

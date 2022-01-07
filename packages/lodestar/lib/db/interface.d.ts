@@ -2,7 +2,7 @@
  * @module db/api/beacon
  */
 import { IDbMetrics } from "@chainsafe/lodestar-db";
-import { AttesterSlashingRepository, BlockArchiveRepository, BlockRepository, DepositEventRepository, DepositDataRootRepository, Eth1DataRepository, ProposerSlashingRepository, StateArchiveRepository, VoluntaryExitRepository, BestPartialLightClientUpdateRepository, CheckpointHeaderRepository, SyncCommitteeRepository, SyncCommitteeWitnessRepository } from "./repositories";
+import { AttesterSlashingRepository, BlockArchiveRepository, BlockRepository, DepositEventRepository, DepositDataRootRepository, Eth1DataRepository, ProposerSlashingRepository, StateArchiveRepository, VoluntaryExitRepository, BestPartialLightClientUpdateRepository, CheckpointHeaderRepository, SyncCommitteeRepository, SyncCommitteeWitnessRepository, BackfilledRanges } from "./repositories";
 import { PreGenesisState, PreGenesisStateLastProcessedBlock } from "./single";
 /**
  * The DB service manages the data layer of the beacon chain
@@ -26,6 +26,7 @@ export interface IBeaconDb {
     checkpointHeader: CheckpointHeaderRepository;
     syncCommittee: SyncCommitteeRepository;
     syncCommitteeWitness: SyncCommitteeWitnessRepository;
+    backfilledRanges: BackfilledRanges;
     /**
      * Start the connection to the db instance and open the db store.
      */

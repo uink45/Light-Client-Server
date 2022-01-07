@@ -28,6 +28,7 @@ export declare class BeaconChain implements IBeaconChain {
     readonly eth1: IEth1ForBlockProduction;
     readonly executionEngine: IExecutionEngine;
     readonly config: IBeaconConfig;
+    readonly anchorSlot: Slot;
     bls: IBlsVerifier;
     forkChoice: IForkChoice;
     clock: IBeaconClock;

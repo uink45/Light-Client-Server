@@ -16,8 +16,8 @@ class BeaconNodeOptions {
      * - existing options file
      * - CLI flags
      */
-    constructor({ network, configFile, beaconNodeOptionsCli, }) {
-        this.beaconNodeOptions = mergeBeaconNodeOptions(network ? (0, networks_1.getNetworkBeaconNodeOptions)(network) : {}, configFile ? readBeaconNodeOptions(configFile) : {}, beaconNodeOptionsCli);
+    constructor({ network, configFile, bootnodesFile, beaconNodeOptionsCli, }) {
+        this.beaconNodeOptions = mergeBeaconNodeOptions(network ? (0, networks_1.getNetworkBeaconNodeOptions)(network) : {}, configFile ? readBeaconNodeOptions(configFile) : {}, bootnodesFile ? (0, networks_1.getInjectableBootEnrs)(bootnodesFile) : {}, beaconNodeOptionsCli);
     }
     /**
      * Returns current options

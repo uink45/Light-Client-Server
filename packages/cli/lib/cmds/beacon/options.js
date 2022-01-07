@@ -119,6 +119,11 @@ exports.beaconPathsOptions = {
         description: "Path to output all logs to a persistent log file",
         type: "string",
     },
+    bootnodesFile: {
+        hidden: true,
+        description: "Bootnodes file path",
+        type: "string",
+    },
 };
 exports.beaconOptions = {
     ...exports.beaconExtraOptions,

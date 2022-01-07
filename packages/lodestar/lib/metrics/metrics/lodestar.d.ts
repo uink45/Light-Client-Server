@@ -14,7 +14,6 @@ export declare function createLodestarMetrics(register: RegistryMetricCreator, m
     peerDisconnectedEvent: import("../utils/gauge").GaugeExtra<"direction">;
     peerGoodbyeReceived: import("../utils/gauge").GaugeExtra<"reason">;
     peerGoodbyeSent: import("../utils/gauge").GaugeExtra<"reason">;
-    peersTotalUniqueConnected: import("../utils/gauge").GaugeExtra<string>;
     peersRequestedToConnect: import("../utils/gauge").GaugeExtra<string>;
     peersRequestedToDisconnect: import("../utils/gauge").GaugeExtra<string>;
     peersRequestedSubnetsToQuery: import("../utils/gauge").GaugeExtra<"type">;
@@ -102,6 +101,13 @@ export declare function createLodestarMetrics(register: RegistryMetricCreator, m
     gossipBlock: {
         elappsedTimeTillReceived: import("../utils/histogram").HistogramExtra<string>;
         elappsedTimeTillProcessed: import("../utils/histogram").HistogramExtra<string>;
+    };
+    backfillSync: {
+        backfilledTillSlot: import("../utils/gauge").GaugeExtra<string>;
+        prevFinOrWsSlot: import("../utils/gauge").GaugeExtra<string>;
+        totalBlocks: import("../utils/gauge").GaugeExtra<"method">;
+        errors: import("../utils/gauge").GaugeExtra<string>;
+        status: import("../utils/gauge").GaugeExtra<string>;
     };
     validatorMonitor: {
         validatorsTotal: import("../utils/gauge").GaugeExtra<"index">;
