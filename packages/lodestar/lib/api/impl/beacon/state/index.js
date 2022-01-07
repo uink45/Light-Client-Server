@@ -136,14 +136,14 @@ function getBeaconStateApi({ chain, config, db }) {
              if (stateEpoch < config.ALTAIR_FORK_EPOCH) {
                  throw new errors_1.ApiError(400, "Requested state before ALTAIR_FORK_EPOCH");
              }
-             const proofs = await chain.lightClientServer.getCurrentSyncCommitteeProof(state);
+             const currentSyncCommitteeProof = await chain.lightClientServer.getCurrentSyncCommitteeProof(state);
              state.latestBlockHeader.stateRoot = state.hashTreeRoot();
              return {
                  data: {
                      header: state.latestBlockHeader,
-                     pubkeys: state.currentSyncCommittee.pubkeys,
-                     aggregatePubkey: state.currentSyncCommittee.aggregatePubkey,
-                     currentSyncCommitteeBranch: proofs,
+                     currentSyncCommitteePubkeys: state.currentSyncCommittee.pubkeys,
+                     currentSyncCommitteeAggregatePubkey: state.currentSyncCommittee.aggregatePubkey,
+                     currentSyncCommitteeBranch: currentSyncCommitteeProof,
                  },
              };
          },

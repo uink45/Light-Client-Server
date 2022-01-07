@@ -112,8 +112,8 @@ function getReturnTypes() {
     const EpochSyncCommitteesResponse = new ssz_1.ContainerType({
         fields: {
             header: lodestar_types_1.ssz.phase0.BeaconBlockHeader,
-            pubkeys: (0, utils_1.ArrayOf)(lodestar_types_1.ssz.BLSPubkey),
-            aggregatePubkey: lodestar_types_1.ssz.BLSPubkey,
+            currentSyncCommitteePubkeys: (0, utils_1.ArrayOf)(lodestar_types_1.ssz.BLSPubkey),
+            currentSyncCommitteeAggregatePubkey: lodestar_types_1.ssz.BLSPubkey,
             currentSyncCommitteeBranch: new ssz_1.VectorType({ elementType: lodestar_types_1.ssz.Root, length: 5 }),
         },
     });

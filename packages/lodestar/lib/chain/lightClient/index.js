@@ -161,6 +161,12 @@ class LightClientServer {
       return proof;
     }
 
+    async getNextSyncCommitteeProof(state){
+        const syncCommitteeWitness = await proofs_1.getSyncCommitteesWitness(state);
+        const proof = await proofs_1.getNextSyncCommitteeBranch(syncCommitteeWitness);
+        return proof;
+    }
+
     /**
      * API ROUTE to get `currentSyncCommittee` and `nextSyncCommittee` from a trusted state root
      */
