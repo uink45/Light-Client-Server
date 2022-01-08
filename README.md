@@ -4,11 +4,9 @@ This is a [Lodestar Beacon Chain Client](https://github.com/ChainSafe/lodestar) 
 
 ### Requirements
 - Node.js - [Downloaded here](https://nodejs.org/en/)
-<<<<<<< HEAD
 - Microsoft Visual Studio Build Tools 2019 
 - Python - [Downloaded here](https://www.python.org/downloads/)
 =======
->>>>>>> 12b602aa94f9c61906139995736b26e7e143bf0a
 - Yarn - Installed via the command `npm install --global yarn`
 
 ### Instructions
