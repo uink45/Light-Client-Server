@@ -6,12 +6,14 @@ import { IMetrics } from "../../metrics";
 import { IBeaconDb } from "../../db";
 import { CheckpointStateCache, StateContextCache } from "../stateCache";
 import { IStateRegenerator, RegenCaller } from "./interface";
+import { ChainEventEmitter } from "../emitter";
 export declare type RegenModules = {
     db: IBeaconDb;
     forkChoice: IForkChoice;
     stateCache: StateContextCache;
     checkpointStateCache: CheckpointStateCache;
     config: IChainForkConfig;
+    emitter: ChainEventEmitter;
     metrics: IMetrics | null;
 };
 /**

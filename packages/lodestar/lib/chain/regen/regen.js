@@ -7,6 +7,7 @@ const lodestar_utils_1 = require("@chainsafe/lodestar-utils");
 const lodestar_params_1 = require("@chainsafe/lodestar-params");
 const errors_1 = require("./errors");
 const checkpoint_1 = require("../blocks/utils/checkpoint");
+const emitter_1 = require("../emitter");
 /**
  * Regenerates states that have already been processed by the fork choice
  */
@@ -189,12 +190,14 @@ async function processSlotsToNearestCheckpoint(modules, preState, slot) {
     const postSlot = slot;
     const preEpoch = (0, lodestar_beacon_state_transition_1.computeEpochAtSlot)(preSlot);
     let postState = preState.clone();
+    const { checkpointStateCache, emitter, metrics } = modules;
     for (let nextEpochSlot = (0, lodestar_beacon_state_transition_1.computeStartSlotAtEpoch)(preEpoch + 1); nextEpochSlot <= postSlot; nextEpochSlot += lodestar_params_1.SLOTS_PER_EPOCH) {
-        postState = lodestar_beacon_state_transition_1.allForks.processSlots(postState, nextEpochSlot, modules.metrics);
+        postState = lodestar_beacon_state_transition_1.allForks.processSlots(postState, nextEpochSlot, metrics);
         // Cache state to preserve epoch transition work
         const checkpointState = postState.clone();
         const cp = (0, checkpoint_1.getCheckpointFromState)(checkpointState);
-        modules.checkpointStateCache.add(cp, checkpointState);
+        checkpointStateCache.add(cp, checkpointState);
+        emitter.emit(emitter_1.ChainEvent.checkpoint, cp, checkpointState);
         // this avoids keeping our node busy processing blocks
         await (0, lodestar_utils_1.sleep)(0);
     }

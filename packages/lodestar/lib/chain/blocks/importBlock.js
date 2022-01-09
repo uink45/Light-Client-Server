@@ -82,6 +82,7 @@ async function importBlock(chain, fullyVerifiedBlock) {
         const attestations = Array.from((0, ssz_1.readonlyValues)(block.message.body.attestations));
         const rootCache = new lodestar_beacon_state_transition_1.altair.RootCache(postState);
         const parentSlot = (_a = chain.forkChoice.getBlock(block.message.parentRoot)) === null || _a === void 0 ? void 0 : _a.slot;
+        const invalidAttestationErrorsByCode = new Map();
         for (const attestation of attestations) {
             try {
                 const indexedAttestation = postState.epochCtx.getIndexedAttestation(attestation);
@@ -92,8 +93,25 @@ async function importBlock(chain, fullyVerifiedBlock) {
                 pendingEvents.push(emitter_1.ChainEvent.attestation, attestation);
             }
             catch (e) {
-                chain.logger.error("Error processing attestation from block", { slot: block.message.slot }, e);
+                // a block has a lot of attestations and it may has same error, we don't want to log all of them
+                if (e instanceof lodestar_fork_choice_1.ForkChoiceError && e.type.code === lodestar_fork_choice_1.ForkChoiceErrorCode.INVALID_ATTESTATION) {
+                    let errWithCount = invalidAttestationErrorsByCode.get(e.type.err.code);
+                    if (errWithCount === undefined) {
+                        errWithCount = { error: e, count: 1 };
+                        invalidAttestationErrorsByCode.set(e.type.err.code, errWithCount);
+                    }
+                    else {
+                        errWithCount.count++;
+                    }
+                }
+                else {
+                    // always log other errors
+                    chain.logger.warn("Error processing attestation from block", { slot: block.message.slot }, e);
+                }
             }
+        }
+        for (const { error, count } of invalidAttestationErrorsByCode.values()) {
+            chain.logger.warn("Error processing attestations from block", { slot: block.message.slot, erroredAttestations: count }, error);
         }
     }
     // - Write block and state to hot db

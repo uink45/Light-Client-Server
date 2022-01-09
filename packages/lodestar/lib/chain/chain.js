@@ -68,6 +68,7 @@ class BeaconChain {
             checkpointStateCache,
             db,
             metrics,
+            emitter,
             signal,
         });
         const lightClientServer = new lightClient_1.LightClientServer({ config, db, emitter, logger }, { genesisTime: this.genesisTime, genesisValidatorsRoot: this.genesisValidatorsRoot });
