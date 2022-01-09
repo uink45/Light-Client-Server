@@ -154,13 +154,32 @@ function getBeaconStateApi({ chain, config, db }) {
                  throw new errors_1.ApiError(400, "Requested state before ALTAIR_FORK_EPOCH");
              }
              const currentSyncCommitteeProof = await chain.lightClientServer.getCurrentSyncCommitteeProof(state);
-             state.latestBlockHeader.stateRoot = state.hashTreeRoot();
+             let block = state.latestBlockHeader;
+             block.stateRoot = state.hashTreeRoot();
              return {
                  data: {
-                     header: state.latestBlockHeader,
+                     header: block,
                      currentSyncCommitteePubkeys: state.currentSyncCommittee.pubkeys,
                      currentSyncCommitteeAggregatePubkey: state.currentSyncCommittee.aggregatePubkey,
                      currentSyncCommitteeBranch: currentSyncCommitteeProof,
+                 },
+             };
+         },
+
+         async getHeaderUpdate(stateId){
+             const state = (await (0, utils_1.resolveStateId)(config, chain, db, stateId));
+             const block = await chain.getCanonicalBlockAtSlot(state.latestBlockHeader.slot);
+             let attestedHeader = state.latestBlockHeader;
+             attestedHeader.stateRoot = state.hashTreeRoot();
+             const nextSyncCommitteeProof = await chain.lightClientServer.getNextSyncCommitteeProof(state);
+             return {
+                 data: {
+                     attestedHeader: attestedHeader,
+                     nextSyncCommitteePubkeys: state.nextSyncCommittee.pubkeys,
+                     nextSyncCommitteeAggregatePubkey: state.nextSyncCommittee.aggregatePubkey,
+                     nextSyncCommitteeBranch: nextSyncCommitteeProof,
+                     syncAggregate: block.message.body.syncAggregate,
+                     forkVersion: config.getForkVersion(attestedHeader.slot),
                  },
              };
          },
