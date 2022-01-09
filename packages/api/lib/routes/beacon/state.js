@@ -10,6 +10,7 @@ const utils_1 = require("../../utils");
 exports.routesData = {
     getEpochCommittees: { url: "/eth/v1/beacon/states/:stateId/committees", method: "GET" },
     getEpochSyncCommittees: { url: "/eth/v1/beacon/states/:stateId/sync_committees", method: "GET" },
+    getSnapshot: { url: "/eth/v1/lightclient/:stateId/snapshot", method: "GET" },
     getStateFinalityCheckpoints: { url: "/eth/v1/beacon/states/:stateId/finality_checkpoints", method: "GET" },
     getStateFork: { url: "/eth/v1/beacon/states/:stateId/fork", method: "GET" },
     getStateRoot: { url: "/eth/v1/beacon/states/:stateId/root", method: "GET" },
@@ -40,6 +41,7 @@ function getReqSerializers() {
                 query: { epoch: utils_1.Schema.Uint },
             },
         },
+        getSnapshot: stateIdOnlyReq,
         getStateFinalityCheckpoints: stateIdOnlyReq,
         getStateFork: stateIdOnlyReq,
         getStateRoot: stateIdOnlyReq,
@@ -111,6 +113,12 @@ function getReturnTypes() {
     });
     const EpochSyncCommitteesResponse = new ssz_1.ContainerType({
         fields: {
+            validators: (0, utils_1.ArrayOf)(lodestar_types_1.ssz.ValidatorIndex),
+            validatorAggregates: (0, utils_1.ArrayOf)(lodestar_types_1.ssz.ValidatorIndex),
+        },
+    });
+    const SnapshotResponse = new ssz_1.ContainerType({
+        fields: {
             header: lodestar_types_1.ssz.phase0.BeaconBlockHeader,
             currentSyncCommitteePubkeys: (0, utils_1.ArrayOf)(lodestar_types_1.ssz.BLSPubkey),
             currentSyncCommitteeAggregatePubkey: lodestar_types_1.ssz.BLSPubkey,
@@ -126,6 +134,7 @@ function getReturnTypes() {
         getStateValidatorBalances: (0, utils_1.ContainerData)((0, utils_1.ArrayOf)(ValidatorBalance)),
         getEpochCommittees: (0, utils_1.ContainerData)((0, utils_1.ArrayOf)(EpochCommitteeResponse)),
         getEpochSyncCommittees: (0, utils_1.ContainerData)(EpochSyncCommitteesResponse),
+        getSnapshot: (0, utils_1.ContainerData)(SnapshotResponse),
     };
 }
 exports.getReturnTypes = getReturnTypes;

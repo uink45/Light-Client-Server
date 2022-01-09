@@ -136,6 +136,23 @@ function getBeaconStateApi({ chain, config, db }) {
              if (stateEpoch < config.ALTAIR_FORK_EPOCH) {
                  throw new errors_1.ApiError(400, "Requested state before ALTAIR_FORK_EPOCH");
              }
+             return {
+                 data: {
+                     validators: (0, utils_1.getSyncCommittees)(state, epoch !== null && epoch !== void 0 ? epoch : stateEpoch),
+                     // TODO: This is not used by the validator and will be deprecated soon
+                     validatorAggregates: [],
+                 },
+             };
+         },
+         async getSnapshot(stateId) {
+             // TODO: Should pick a state with the provided epoch too
+             const state = (await (0, utils_1.resolveStateId)(config, chain, db, stateId));
+             // TODO: If possible compute the syncCommittees in advance of the fork and expose them here.
+             // So the validators can prepare and potentially attest the first block. Not critical tho, it's very unlikely
+             const stateEpoch = (0, lodestar_beacon_state_transition_1.computeEpochAtSlot)(state.slot);
+             if (stateEpoch < config.ALTAIR_FORK_EPOCH) {
+                 throw new errors_1.ApiError(400, "Requested state before ALTAIR_FORK_EPOCH");
+             }
              const currentSyncCommitteeProof = await chain.lightClientServer.getCurrentSyncCommitteeProof(state);
              state.latestBlockHeader.stateRoot = state.hashTreeRoot();
              return {
