@@ -12,6 +12,7 @@ exports.routesData = {
     getEpochSyncCommittees: { url: "/eth/v1/beacon/states/:stateId/sync_committees", method: "GET" },
     getSnapshot: { url: "/eth/v1/lightclient/:stateId/snapshot", method: "GET" },
     getHeaderUpdate: { url: "/eth/v1/lightclient/:stateId/header_update", method: "GET" },
+    getHeader: { url: "/eth/v1/lightclient/:stateId/header", method: "GET" },
     getStateFinalityCheckpoints: { url: "/eth/v1/beacon/states/:stateId/finality_checkpoints", method: "GET" },
     getStateFork: { url: "/eth/v1/beacon/states/:stateId/fork", method: "GET" },
     getStateRoot: { url: "/eth/v1/beacon/states/:stateId/root", method: "GET" },
@@ -44,6 +45,7 @@ function getReqSerializers() {
         },
         getSnapshot: stateIdOnlyReq,
         getHeaderUpdate: stateIdOnlyReq,
+        getHeader: stateIdOnlyReq,
         getStateFinalityCheckpoints: stateIdOnlyReq,
         getStateFork: stateIdOnlyReq,
         getStateRoot: stateIdOnlyReq,
@@ -137,6 +139,13 @@ function getReturnTypes() {
             forkVersion: lodestar_types_1.ssz.Version,
         },
     });
+    const HeaderResponse = new ssz_1.ContainerType({
+        fields: {
+            attestedHeader: lodestar_types_1.ssz.phase0.BeaconBlockHeader,
+            syncAggregate: lodestar_types_1.ssz.altair.SyncAggregate,
+            forkVersion: lodestar_types_1.ssz.Version,
+        },
+    });
     return {
         getStateRoot: (0, utils_1.ContainerData)(lodestar_types_1.ssz.Root),
         getStateFork: (0, utils_1.ContainerData)(lodestar_types_1.ssz.phase0.Fork),
@@ -148,6 +157,7 @@ function getReturnTypes() {
         getEpochSyncCommittees: (0, utils_1.ContainerData)(EpochSyncCommitteesResponse),
         getSnapshot: (0, utils_1.ContainerData)(SnapshotResponse),
         getHeaderUpdate: (0, utils_1.ContainerData)(HeaderUpdateResponse),
+        getHeader: (0, utils_1.ContainerData)(HeaderResponse),
     };
 }
 exports.getReturnTypes = getReturnTypes;

@@ -165,7 +165,6 @@ function getBeaconStateApi({ chain, config, db }) {
                  },
              };
          },
-
          async getHeaderUpdate(stateId){
              const state = (await (0, utils_1.resolveStateId)(config, chain, db, stateId));
              const block = await chain.getCanonicalBlockAtSlot(state.latestBlockHeader.slot);
@@ -183,6 +182,19 @@ function getBeaconStateApi({ chain, config, db }) {
                  },
              };
          },
+         async getHeader(stateId){
+             const state = (await (0, utils_1.resolveStateId)(config, chain, db, stateId));
+             const block = await chain.getCanonicalBlockAtSlot(state.latestBlockHeader.slot);
+             let attestedHeader = state.latestBlockHeader;
+             attestedHeader.stateRoot = state.hashTreeRoot();
+             return {
+                 data: {
+                     attestedHeader: attestedHeader,
+                     syncAggregate: block.message.body.syncAggregate,
+                     forkVersion: config.getForkVersion(attestedHeader.slot),
+                 },
+             };
+         }
     };
 }
 exports.getBeaconStateApi = getBeaconStateApi;
