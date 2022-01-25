@@ -15,7 +15,6 @@ namespace LightClientV2
         public static LightClientFunctions Client;
         public static LightClientUtility Utility;
         public static LocalClock Clock;
-        public static Logging Logs;
         public static Server Server;
         public static bool NextSyncCommitteeReady;
 
@@ -25,7 +24,6 @@ namespace LightClientV2
             Client = new LightClientFunctions();
             Utility = new LightClientUtility();
             Clock = new LocalClock();
-            Logs = new Logging();
             Server = new Server();
             NextSyncCommitteeReady = false;
         }
@@ -49,8 +47,7 @@ namespace LightClientV2
                     if(snapshot != null)
                     {
                         Client.ValidateCheckpoint(snapshot);
-                        Logs.SelectLogsType("Info", 2, null);
-                        Logs.PrintSnapshot(snapshot);
+                        Console.WriteLine("Synced");
                         break;
                     }              
                 }                   
@@ -59,36 +56,38 @@ namespace LightClientV2
 
         public static async Task FetchUpdates()
         {
-            Logs.SelectLogsType("Info", 3, null);
-            while (true)
+            LightClientUpdate update = await Server.FetchHeader();
+            if (update != null)
             {
-                try
-                {
-                    await Task.Delay(11900);
-                    if (NextSyncCommitteeReady & CheckSyncPeriod())
-                    {
-                        LightClientUpdate update = await Server.FetchLightClientUpdate(Clock.SyncPeriodAtEpoch().ToString());
-                        if (update != null)
-                        {
-                            Client.ProcessLightClientUpdate(Client.storage, update, Clock.CurrentSlot(), Utility.ConvertHexStringToRoot("0x4b363db94e286120d76eb905340fdd4e54bfe9f06bf33ff6cf5ad27f511bfe95"));
-                            Logs.PrintClientLogs(update);
-                        }
-                    }
-                    else
-                    {
-                        LightClientUpdate update = await Server.FetchHeader();
-                        if (update != null)
-                        {
-                            Client.ProcessLightClientUpdate(Client.storage, update, Clock.CurrentSlot(), Utility.ConvertHexStringToRoot("0x4b363db94e286120d76eb905340fdd4e54bfe9f06bf33ff6cf5ad27f511bfe95"));
-                            Logs.PrintClientLogs(update);
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    Logs.SelectLogsType("Error", 0, e.Message);
-                }
+                Client.ProcessLightClientUpdate(Client.storage, update, Clock.CurrentSlot(), Utility.ConvertHexStringToRoot("0x4b363db94e286120d76eb905340fdd4e54bfe9f06bf33ff6cf5ad27f511bfe95"));
             }
+            //while (true)
+            //{
+            //    try
+            //    {
+            //        await Task.Delay(11900);
+            //        if (NextSyncCommitteeReady & CheckSyncPeriod())
+            //        {
+            //            LightClientUpdate update = await Server.FetchLightClientUpdate(Clock.SyncPeriodAtEpoch().ToString());
+            //            if (update != null)
+            //            {
+            //                Client.ProcessLightClientUpdate(Client.storage, update, Clock.CurrentSlot(), Utility.ConvertHexStringToRoot("0x4b363db94e286120d76eb905340fdd4e54bfe9f06bf33ff6cf5ad27f511bfe95"));
+            //            }
+            //        }
+            //        else
+            //        {
+            //            LightClientUpdate update = await Server.FetchHeader();
+            //            if (update != null)
+            //            {
+            //                Client.ProcessLightClientUpdate(Client.storage, update, Clock.CurrentSlot(), Utility.ConvertHexStringToRoot("0x4b363db94e286120d76eb905340fdd4e54bfe9f06bf33ff6cf5ad27f511bfe95"));
+            //            }
+            //        }
+            //    }
+            //    catch (Exception e)
+            //    {
+
+            //    }
+            //}
         }
 
         public static bool CheckSyncPeriod()
