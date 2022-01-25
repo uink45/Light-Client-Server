@@ -1,1 +1,0 @@
-{"version":3,"file":"processProposerSlashing.d.ts","sourceRoot":"","sources":["../../../src/phase0/block/processProposerSlashing.ts"],"names":[],"mappings":"AAAA,OAAO,EAAW,MAAM,EAAC,MAAM,2BAA2B,CAAC;AAE3D,OAAO,EAAC,iBAAiB,EAAC,MAAM,qBAAqB,CAAC;AAGtD,wBAAgB,uBAAuB,CACrC,KAAK,EAAE,iBAAiB,CAAC,MAAM,CAAC,WAAW,CAAC,EAC5C,gBAAgB,EAAE,MAAM,CAAC,gBAAgB,EACzC,gBAAgB,UAAO,GACtB,IAAI,CAON"}

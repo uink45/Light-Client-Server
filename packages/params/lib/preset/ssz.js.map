@@ -1,1 +1,0 @@
-{"version":3,"file":"ssz.js","sourceRoot":"","sources":["../../src/preset/ssz.ts"],"names":[],"mappings":";AAAA,yDAAyD;;;AAEzD,wCAA6C;AAG7C,qCAAsC;AACtC,qCAAsC;AACtC,mCAAoC;AAEvB,QAAA,YAAY,GAAG,IAAI,mBAAa,CAAgB;IAC3D,MAAM,EAAE;QACN,GAAG,qBAAY,CAAC,MAAM;QACtB,GAAG,qBAAY,CAAC,MAAM;QACtB,GAAG,mBAAW,CAAC,MAAM;KACtB;IACD,YAAY,EAAE,aAAa;CAC5B,CAAC,CAAC"}

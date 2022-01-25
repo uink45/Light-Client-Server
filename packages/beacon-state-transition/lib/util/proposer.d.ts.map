@@ -1,1 +1,0 @@
-{"version":3,"file":"proposer.d.ts","sourceRoot":"","sources":["../../src/util/proposer.ts"],"names":[],"mappings":"AAAA;;GAEG;AAGH,OAAO,EAAC,cAAc,EAAC,MAAM,2BAA2B,CAAC;AAKzD,OAAO,EAAC,aAAa,EAAC,MAAM,0BAA0B,CAAC;AAEvD;;;;GAIG;AACH,wBAAgB,oBAAoB,CAClC,iBAAiB,EAAE,aAAa,CAAC,MAAM,CAAC,EACxC,OAAO,EAAE,cAAc,EAAE,EACzB,IAAI,EAAE,UAAU,GACf,cAAc,CAqBhB"}

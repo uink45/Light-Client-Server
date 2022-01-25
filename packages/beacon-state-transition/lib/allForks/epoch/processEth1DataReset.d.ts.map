@@ -1,1 +1,0 @@
-{"version":3,"file":"processEth1DataReset.d.ts","sourceRoot":"","sources":["../../../src/allForks/epoch/processEth1DataReset.ts"],"names":[],"mappings":"AACA,OAAO,EAAC,QAAQ,EAAS,MAAM,2BAA2B,CAAC;AAE3D,OAAO,EAAC,aAAa,EAAE,iBAAiB,EAAC,MAAM,SAAS,CAAC;AAEzD;;;;GAIG;AACH,wBAAgB,oBAAoB,CAClC,KAAK,EAAE,iBAAiB,CAAC,QAAQ,CAAC,WAAW,CAAC,EAC9C,YAAY,EAAE,aAAa,GAC1B,IAAI,CAON"}
