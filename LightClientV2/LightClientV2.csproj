@@ -31,7 +31,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="lib/libbls384_256.so" Link="libbls384_256.so" Pack="true" PackagePath="runtimes\linux-x64\native">
+    <None Include="lib\libbls384_256.so" Link="libbls384_256.so" Pack="true" PackagePath="runtimes\linux-x64\native">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>		
     </None>
   </ItemGroup>	
