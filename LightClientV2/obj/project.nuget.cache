@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "iBtNQRdo15+xgXXEG0HByCYu/Ui7TCOpEJFvfdm28aLiveuAF+255sbFgEeBs0ic1yrgjinulnNEFIfmYP0OWA==",
+  "dgSpecHash": "9ezowpycaya6a0HoSXxfPu6nWDhWbOw/xXXsoSseIPb2a/2JZFSFtr9/SrMklVld3NwiMQjAVGxKHTgsHJkQkQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\multi\\Documents\\Mycelium\\Research\\Light Client\\Implementation\\Beacon-Chain-Light-Client-Prototype\\LightClientV2\\LightClientV2.csproj",
+  "projectFilePath": "C:\\Users\\multi\\Documents\\GitHub\\Light-Client-Server\\LightClientV2\\LightClientV2.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\multi\\.nuget\\packages\\microsoft.extensions.configuration\\6.0.0\\microsoft.extensions.configuration.6.0.0.nupkg.sha512",
     "C:\\Users\\multi\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\6.0.0\\microsoft.extensions.configuration.abstractions.6.0.0.nupkg.sha512",

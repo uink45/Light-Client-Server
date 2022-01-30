@@ -23,9 +23,9 @@ namespace LightClientV2
         }
 
 
-        public async Task<string> FetchCheckpointRoot(string serverUrl)
+        public async Task<string> FetchCheckpointRoot()
         {
-            string url = serverUrl + "/eth/v1/beacon/states/head/finality_checkpoints";
+            string url = "http://127.0.0.1:9596/eth/v1/beacon/states/head/finality_checkpoints";
             logs.SelectLogsType("Info", 0, url.Remove(22, 46));
             try
             {
@@ -42,9 +42,9 @@ namespace LightClientV2
             return null;
         }
  
-        public async Task<LightClientSnapshot> FetchFinalizedSnapshot(string serverUrl, string checkpointRoot)
+        public async Task<LightClientSnapshot> FetchFinalizedSnapshot(string checkpointRoot)
         {
-            string url = serverUrl + "/eth/v1/lightclient/snapshot/" + checkpointRoot;
+            string url = "http://127.0.0.1:9596/eth/v1/lightclient/snapshot/" + checkpointRoot;
             logs.SelectLogsType("Info", 1, checkpointRoot);
             try
             {
@@ -62,9 +62,9 @@ namespace LightClientV2
             return null;
         }
 
-        public async Task<LightClientUpdate> FetchHeader(string serverUrl, int network)
+        public async Task<LightClientUpdate> FetchHeader()
         {
-            string url = serverUrl + "/eth/v1/lightclient/head_update/";
+            string url = "http://127.0.0.1:9596/eth/v1/lightclient/head_update/";
             try
             {
                 HttpResponseMessage response = await client.GetAsync(url);
@@ -72,7 +72,7 @@ namespace LightClientV2
                 string result = await response.Content.ReadAsStringAsync();
 
                 header.SerializeData(result);
-                return header.InitializeHeader(network);
+                return header.InitializeHeader();
             }
             catch (HttpRequestException e)
             {
@@ -82,9 +82,9 @@ namespace LightClientV2
             return null;
         }
 
-        public async Task<LightClientUpdate> FetchLightClientUpdate(string serverUrl, string syncPeriod)
+        public async Task<LightClientUpdate> FetchLightClientUpdate(string syncPeriod)
         {
-            string url = serverUrl + "/eth/v1/lightclient/committee_updates?from=" + syncPeriod + "&to=" + syncPeriod;
+            string url = "http://127.0.0.1:9596/eth/v1/lightclient/committee_updates?from=" + syncPeriod + "&to=" + syncPeriod;
             try
             {
                 HttpResponseMessage response = await client.GetAsync(url);
