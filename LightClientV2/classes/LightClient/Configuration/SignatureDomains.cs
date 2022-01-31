@@ -2,6 +2,10 @@
 using Nethermind.Core2.Types;
 namespace LightClientV2
 {
+    /// <summary>
+    /// Constants for the domain types as defined in
+    /// https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/beacon-chain.md.
+    /// </summary>
     public class SignatureDomains
     {
         public DomainType BeaconAttestor { get; } = new DomainType(new LightClientUtility().StringToByteArray("0x01000000"));

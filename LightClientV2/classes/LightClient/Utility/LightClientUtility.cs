@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Numerics;
-using System.Collections.Generic;
 using System.Linq;
 using Nethermind.Core2.Types;
 using Nethermind.Core2.Containers;
@@ -22,12 +21,12 @@ namespace LightClientV2
 
         public Constants Constant;
         public TimeParameters TimeParameterOptions;
-        public CryptoUtility Crypto;
+        public BLSUtility Crypto;
         
         public LightClientUtility()
         {
             TimeParameterOptions = new TimeParameters();
-            Crypto = new CryptoUtility();
+            Crypto = new BLSUtility();
             Constant = new Constants();
         }
 
@@ -39,6 +38,11 @@ namespace LightClientV2
             return new Epoch(slot / TimeParameterOptions.SlotsPerEpoch);
         }
 
+        /// <summary>
+        /// Return the signature domain of the 
+        /// domain type, fork version, and 
+        /// genesis validator's root.
+        /// </summary>
         public Domain ComputeDomain(DomainType domainType, ForkVersion forkVersion, Root genesisValidatorsRoot)
         {
             Root forkDataRoot = new ForkData(forkVersion, genesisValidatorsRoot).HashTreeRoot();
@@ -53,25 +57,15 @@ namespace LightClientV2
             return new Domain(array);
         }
 
-        public byte[] StringToByteArray(string hex)
-        {
-            hex = hex.Remove(0, 2);
-            return Enumerable.Range(0, hex.Length)
-                             .Where(x => x % 2 == 0)
-                             .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
-                             .ToArray();
-        }
-
-
         /// <summary>
-        /// Return the signing root of an object by calculating the root of the object-domain tree.
+        /// Return the signing root of an object by 
+        /// calculating the root of the object-domain tree.
         /// </summary>
         public Root ComputeSigningRoot(Root blockRoot, Domain domain)
         {
             SigningRoot domainWrappedObject = new SigningRoot(blockRoot, domain);
             return domainWrappedObject.HashTreeRoot();
         }
-
 
         public bool isEmptyHeader(BeaconBlockHeader header)
         {
@@ -95,7 +89,6 @@ namespace LightClientV2
 
         public bool isZeroHash(Root root)
         {
-            
             for (int i = 0; i < root.ToString().Length; i++)
             {
                 if (root.ToString()[i] != '0' & root.ToString()[i] != 'x') 
@@ -138,10 +131,8 @@ namespace LightClientV2
                     _publicKeys[index] = BlsPublicKey.Zero;
                     _publicKeys[index] = publicKeys[i];
                     index++;
-                }
-                
-            }
-          
+                }              
+            }        
             return _publicKeys;
         }
 
@@ -166,8 +157,16 @@ namespace LightClientV2
             {
                 throw new Exception("Error generating quick start private key.");
             }
-
             return privateKeySpan.ToArray();
+        }
+
+        public byte[] StringToByteArray(string hex)
+        {
+            hex = hex.Remove(0, 2);
+            return Enumerable.Range(0, hex.Length)
+                             .Where(x => x % 2 == 0)
+                             .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
+                             .ToArray();
         }
 
         public BlsSignature ConvertStringToBlsSignature(string hex)

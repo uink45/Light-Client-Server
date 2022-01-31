@@ -21,12 +21,12 @@ namespace LightClientV2
             Contents = JsonConvert.DeserializeObject<HeaderObject.Root>(text);
         }
 
-        public LightClientUpdate InitializeHeader()
+        public LightClientUpdate InitializeHeader(int network)
         {
             LightClientUpdate update = new LightClientUpdate();
             update.AttestedHeader = CreateHeader(Contents.data);
             update.SyncAggregate = CreateSyncAggregate(Contents.data.sync_aggregate.sync_committee_bits, Contents.data.sync_aggregate.sync_committee_signature);
-            update.ForkVersion = new Networks().BeaconChainForkVersion;
+            update.ForkVersion = new Networks().ForkVersions[network];
             return update;
         }
 

@@ -1,54 +1,225 @@
-﻿using Spectre.Console;
+﻿using System.Threading.Tasks;
+using Spectre.Console;
 using System;
+
 namespace LightClientV2
 {
     public class ConsoleInterface
     {
-        public void Display()
+        private CoreSpec Client;
+        private Settings Settings;
+        private Server Server;
+        private Logging Logs;
+        private Clock Clock;
+        private bool NextSyncCommitteeReady;
+        private bool Running;
+
+        public void InitializeClasses()
+        {
+            Client = new CoreSpec();
+            Settings = new Settings();
+            Clock = new Clock();
+            Logs = new Logging();
+            Server = new Server();
+            NextSyncCommitteeReady = false;
+            Running = true;
+        }
+
+        public void DisplayInformation()
         {
             // Clear Console and display title name
             Console.Clear();
-            AnsiConsole.Write(
-                new FigletText("Light Client")
+            AnsiConsole.Write(new FigletText("Light Client")
                 .Alignment(Justify.Center)
-                .Color(Color.Gold3_1));
+                .Color(Color.Yellow));
 
-            //
-            var specVersion = new Rule("[Gold3_1]Spec Version - 1.1.8[/]");
-            specVersion.Border = BoxBorder.Double;
-            specVersion.Alignment = Justify.Center;
+            var specVersion = new Rule("[mediumspringgreen]Spec Version - 1.1.8[/]")
+                .RuleStyle(Style.Parse("mediumspringgreen"))
+                .Alignment(Justify.Center);
             AnsiConsole.Write(specVersion);
 
-            var consensusLayer = new Rule("[Gold3_1]Consensus Layer[/]");
-            consensusLayer.Border = BoxBorder.Double;
-            consensusLayer.Alignment = Justify.Center;
+            var consensusLayer = new Rule("[mediumspringgreen]Consensus Layer[/]")
+                .RuleStyle(Style.Parse("mediumspringgreen"))
+                .Alignment(Justify.Center);
             AnsiConsole.Write(consensusLayer);
+        }
 
-            // Display Options
+        public async Task MainMenu()
+        {
             var option = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
-                    .Title("\nSelect an option")
-                    .HighlightStyle("3")
+                    .Title("\n[mediumspringgreen]SELECT AN OPTION:[/]")
+                    .HighlightStyle("11")
+                    .MoreChoicesText("[yellow](Move up (▲) and down (▼) to reveal more choices)[/]")
                     .PageSize(3)
                     .AddChoices(new[] {
-                        "Connect (~)", "Configuration (*)", "Help (?)", "Close (x)"}));
+                        "[mediumspringgreen]Connect (~)[/]", "[mediumspringgreen]Configuration (*)[/]", "[red]Help (?)[/]", "[mediumspringgreen]Close (x)[/]"})); ;
+            
 
             switch (option)
             {
-                case "Connect (~)":
+                case "[mediumspringgreen]Connect (~)[/]":
+                    await SelectNetwork();
                     return;
-                case "Configuration (*)":
+                case "[mediumspringgreen]Configuration (*)[/]":
+                    SelectConfig();
                     return;
-                case "Help (?)":
+                case "[red]Help (?)[/]":
                     return;
-                case "Close (x)":
-                     System.Environment.Exit(0);  
+                case "[mediumspringgreen]Close (x)[/]":
+                     Console.Clear();
+                     Environment.Exit(0);  
                     return;
             }
-
-
         }
 
+        public async Task SelectNetwork() {
 
+            DisplayInformation();
+
+            var option = AnsiConsole.Prompt(
+               new SelectionPrompt<string>()
+                   .Title("\n[mediumspringgreen]SELECT A NETWORK:[/]")
+                   .HighlightStyle("11")
+                   .PageSize(3)
+                   .AddChoices(new[] {"[mediumspringgreen]Beacon Chain[/]", "[mediumspringgreen]Pyrmont[/]", "[mediumspringgreen]Go Back (<-)[/]"}));
+
+            switch (option)
+            {
+                case "[mediumspringgreen]Beacon Chain[/]":
+                    Settings.Network = 0;
+                    await InitialiseSyncing(Settings);
+                    return;
+                case "[mediumspringgreen]Pyrmont[/]":
+                    Settings.Network = 1;
+                    await InitialiseSyncing(Settings);
+                    return;
+                case "[mediumspringgreen]Go Back (<-)[/]":
+                    return;
+            }
+        }
+
+        public void SelectConfig()
+        {
+            DisplayInformation();
+
+            var option = AnsiConsole.Prompt(
+               new SelectionPrompt<string>()
+                   .Title("\n[mediumspringgreen]SELECT A SETTING TO CHANGE:[/]")
+                   .HighlightStyle("11")
+                   .PageSize(3)
+                   .AddChoices(new[] { $"[mediumspringgreen]Network Server URL:[/] [Lime]{Settings.ServerUrl}[/]", $"[mediumspringgreen]Light Client API URL:[/] [Lime]{Settings.LightClientApiUrl}[/]", "[mediumspringgreen]Go Back (<-)[/]" }));
+
+            if(option == $"[mediumspringgreen]Network Server URL:[/] [Lime]{Settings.ServerUrl}[/]")
+            {
+                Settings.ServerUrl = AnsiConsole.Ask<string>("[mediumspringgreen]Enter the network's server URL:[/]");
+            }
+            else if(option == $"[mediumspringgreen]Light Client API URL:[/] [Lime]{Settings.LightClientApiUrl}[/]")
+            {
+                Settings.LightClientApiUrl = AnsiConsole.Ask<string>("[mediumspringgreen]Enter the light client REST API URL to expose:[/]");
+            }
+            else if(option == "[mediumspringgreen]Go Back (<-)[/]")
+            {
+                return;
+            }
+            SelectConfig();
+        }
+
+        public async Task InitialiseSyncing(Settings settings)
+        {
+            Console.Clear();
+
+            var message = new Rule("[mediumspringgreen]Press[/] [yellow]CTRL[/] [mediumspringgreen]+[/] [yellow]C[/][mediumspringgreen] To Return (Will need to wait)[/]")
+                .RuleStyle(Style.Parse("mediumspringgreen"))
+                .Alignment(Justify.Center);
+            AnsiConsole.Write(message);
+            Console.WriteLine();
+
+            await Connect(settings);
+        }
+
+        public async Task Connect(Settings settings)
+        {
+            DetectKeyPress();
+            CheckSyncPeriod();
+            await InitializeLightClient(settings);
+            await FetchUpdates(settings);
+        }
+
+        public async Task InitializeLightClient(Settings settings)
+        {
+            while (Running)
+            {
+                string checkpointRoot = await Server.FetchCheckpointRoot(settings.ServerUrl);
+                if (checkpointRoot != null)
+                {
+                    LightClientSnapshot snapshot = await Server.FetchFinalizedSnapshot(settings.ServerUrl, checkpointRoot);
+                    if (snapshot != null)
+                    {
+                        Client.ValidateCheckpoint(snapshot);
+                        Logs.SelectLogsType("Info", 2, null);
+                        Logs.PrintSnapshot(snapshot);
+                        break;
+                    }
+                }
+            }      
+        }
+
+        public async Task DetectKeyPress()
+        {
+            Console.CancelKeyPress += (object sender, ConsoleCancelEventArgs e) =>
+            {
+                var isCtrlC = e.SpecialKey == ConsoleSpecialKey.ControlC;
+
+                // Prevent CTRL-C from terminating
+                if (isCtrlC)
+                {
+                    Running = false;
+                    e.Cancel = true;
+                }
+                // e.Cancel defaults to false so CTRL-BREAK will still cause termination
+            };
+        }
+
+        public async Task FetchUpdates(Settings settings)
+        {
+            Logs.SelectLogsType("Info", 3, null);
+            while (Running)
+            {
+                if (NextSyncCommitteeReady & CheckSyncPeriod())
+                {
+                    LightClientUpdate update = await Server.FetchLightClientUpdate(settings.ServerUrl, Clock.CalculateRemainingSyncPeriod(settings.Network).ToString());
+                    if (update != null)
+                    {
+                        Client.ProcessLightClientUpdate(Client.storage, update, Clock.CalculateSlot(settings.Network), new Networks().GenesisRoots[settings.Network]);
+                        Logs.PrintClientLogs(update);
+                    }
+                }
+                else
+                {
+                    LightClientUpdate update = await Server.FetchHeader(settings.ServerUrl, settings.Network);
+                    if (update != null)
+                    {
+                        Client.ProcessLightClientUpdate(Client.storage, update, Clock.CalculateSlot(settings.Network), new Networks().GenesisRoots[settings.Network]);
+                        Logs.PrintClientLogs(update);
+                    }
+                }
+                await Task.Delay(12000);
+            }
+        }
+
+        public bool CheckSyncPeriod()
+        {
+            if (Clock.CalculateEpochsInSyncPeriod(0) == 255 & !NextSyncCommitteeReady)
+            {
+                NextSyncCommitteeReady = true;
+                return true;
+            }
+            else if (Clock.CalculateEpochsInSyncPeriod(0) > 255 & NextSyncCommitteeReady)
+            {
+                NextSyncCommitteeReady = false;
+            }
+            return false;
+        }
     }
 }

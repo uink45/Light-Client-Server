@@ -1,7 +1,5 @@
 ﻿using System;
-using Nethermind.Core2.Types;
-using Nethermind.Core2.Containers;
-
+using Spectre.Console;
 
 namespace LightClientV2
 {
@@ -23,7 +21,33 @@ namespace LightClientV2
                 case "Error":
                     PrintErrorLogs(log, message);
                     break;
+                case "Warn":
+                    PrintWarnLogs(log, message);
+                    break;
             }    
+        }
+
+        private void PrintInfoLogs(int log, string? message)
+        {
+            Console.Write("[{0}]", DateTime.Now.ToString("MMM-dd HH:mm:ss"));
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
+            Console.Write(" [INFO] ");
+            Console.ForegroundColor = ConsoleColor.White;
+            switch (log)
+            {
+                case 0:                             
+                    Console.WriteLine("Fetching latest checkpoint root from: " + message);
+                    break;
+                case 1:
+                    Console.WriteLine("Initialising from latest checkpoint root: " + message);
+                    break;
+                case 2:
+                    Console.WriteLine("Initialisation successful!" + " Local Clock - slot: " + Clock.CalculateSlot(0) + ", epoch: " + Clock.CalculateEpoch(0));
+                    break;
+                case 3:
+                    Console.WriteLine("Started tracking the header." + " Local Clock - slot: " + Clock.CalculateSlot(0) + ", epoch: " + Clock.CalculateEpoch(0));
+                    break;
+            }
         }
 
         public void PrintSnapshot(LightClientSnapshot snapshot)
@@ -44,29 +68,19 @@ namespace LightClientV2
             Console.WriteLine("Header Updated - slot: " + update.AttestedHeader.Slot + ", state root: " + update.AttestedHeader.StateRoot.ToString().Remove(10, 56) + "..." + " Local Clock - slot: " + Clock.CalculateSlot(0) + ", epoch: " + Clock.CalculateEpoch(0));
         }
 
-        private void PrintInfoLogs(int log, string? message)
+        private void PrintWarnLogs(int log, string? message)
         {
             Console.Write("[{0}]", DateTime.Now.ToString("MMM-dd HH:mm:ss"));
-            Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Console.Write(" [INFO] ");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.Write(" [WARNING] ");
             Console.ForegroundColor = ConsoleColor.White;
             switch (log)
             {
-                case 0:                             
-                    Console.WriteLine("Fetching latest checkpoint root from: " + message);
-                    break;
-                case 1:
-                    Console.WriteLine("Initializing from latest checkpoint root: " + message);
-                    break;
-                case 2:
-                    Console.WriteLine("Initialization successful!" + " Local Clock - slot: " + Clock.CalculateSlot(0) + ", epoch: " + Clock.CalculateEpoch(0));
-                    break;
-                case 3:
-                    Console.WriteLine("Started tracking the header." + " Local Clock - slot: " + Clock.CalculateSlot(0) + ", epoch: " + Clock.CalculateEpoch(0));
+                case 0:
+                    Console.WriteLine(message);
                     break;
             }
         }
-
 
         private void PrintErrorLogs(int log, string? message)
         {
