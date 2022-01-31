@@ -186,6 +186,7 @@ namespace LightClientV2
             Logs.SelectLogsType("Info", 3, null);
             while (Running)
             {
+                await Task.Delay(12000);
                 if (NextSyncCommitteeReady & CheckSyncPeriod())
                 {
                     LightClientUpdate update = await Server.FetchLightClientUpdate(settings.ServerUrl, Clock.CalculateRemainingSyncPeriod(settings.Network).ToString());
@@ -203,8 +204,7 @@ namespace LightClientV2
                         Client.ProcessLightClientUpdate(Client.storage, update, Clock.CalculateSlot(settings.Network), new Networks().GenesisRoots[settings.Network]);
                         Logs.PrintClientLogs(update);
                     }
-                }
-                await Task.Delay(12000);
+                }                
             }
         }
 
