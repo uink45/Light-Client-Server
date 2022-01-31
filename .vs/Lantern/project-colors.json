@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "20a5c232-11b2-42a1-ad7b-be0e8e53a06d": {
+      "ProjectGuid": "20a5c232-11b2-42a1-ad7b-be0e8e53a06d",
+      "DisplayName": "Lantern",
+      "ColorIndex": 0
+    }
+  },
+  "NextColorIndex": 1
+}
