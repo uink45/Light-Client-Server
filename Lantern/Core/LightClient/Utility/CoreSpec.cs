@@ -70,7 +70,8 @@ namespace Lantern
             Epoch finalizedPeriod = new Epoch((ulong)Math.Floor((decimal)((ulong)utility.ComputeEpochAtSlot(store.FinalizedHeader.Slot) / time.EpochsPerSyncCommitteePeriod)));
             Epoch updatePeriod = new Epoch((ulong)Math.Floor((decimal)((ulong)utility.ComputeEpochAtSlot(activeHeader.Slot) / time.EpochsPerSyncCommitteePeriod)));
             Epoch newPeriod = finalizedPeriod + new Epoch(1);
-          
+            Console.WriteLine(updatePeriod.ToString());
+            Console.WriteLine(finalizedPeriod.ToString());
             if (updatePeriod != finalizedPeriod & updatePeriod != newPeriod)
             {
                 throw new ArgumentOutOfRangeException("Finalized Period", finalizedPeriod, $"Update skips a sync committee period.");
