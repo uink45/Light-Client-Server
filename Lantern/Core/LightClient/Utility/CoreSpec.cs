@@ -64,7 +64,7 @@ namespace Lantern
 
             if (!(currentSlot >= activeHeader.Slot & activeHeader.Slot > store.FinalizedHeader.Slot))
             {
-                logging.SelectLogsType("Warn", 0, $"Retrieved block at slot {activeHeader.Slot} is older than current slot {currentSlot}.");
+                logging.SelectLogsType("Warn", 0, $"Received a block (at slot {activeHeader.Slot}) that is older than the stored block ({store.FinalizedHeader.Slot}).");
             }
 
             Epoch finalizedPeriod = new Epoch((ulong)Math.Floor((decimal)((ulong)utility.ComputeEpochAtSlot(store.FinalizedHeader.Slot) / time.EpochsPerSyncCommitteePeriod)));

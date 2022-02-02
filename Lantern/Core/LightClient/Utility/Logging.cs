@@ -1,6 +1,4 @@
 ﻿using System;
-using Spectre.Console;
-
 namespace Lantern
 {
     public class Logging
