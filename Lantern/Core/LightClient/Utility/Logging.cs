@@ -1,4 +1,5 @@
 ﻿using System;
+
 namespace Lantern
 {
     public class Logging

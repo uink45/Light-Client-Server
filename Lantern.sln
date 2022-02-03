@@ -3,9 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lantern", "Lantern\Lantern.csproj", "{88BE3E23-5B82-4A98-B6F1-68D269A9050F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LightClientAPI", "LightClientAPI\LightClientAPI.csproj", "{24BC0088-E4B9-49E1-BB6F-F6BE9EDA7985}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lantern", "Lantern\Lantern.csproj", "{B8FF71CF-A33E-44A4-83A3-D9F037567BBA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,19 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{88BE3E23-5B82-4A98-B6F1-68D269A9050F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{88BE3E23-5B82-4A98-B6F1-68D269A9050F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{88BE3E23-5B82-4A98-B6F1-68D269A9050F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{88BE3E23-5B82-4A98-B6F1-68D269A9050F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{24BC0088-E4B9-49E1-BB6F-F6BE9EDA7985}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{24BC0088-E4B9-49E1-BB6F-F6BE9EDA7985}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{24BC0088-E4B9-49E1-BB6F-F6BE9EDA7985}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{24BC0088-E4B9-49E1-BB6F-F6BE9EDA7985}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8FF71CF-A33E-44A4-83A3-D9F037567BBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8FF71CF-A33E-44A4-83A3-D9F037567BBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8FF71CF-A33E-44A4-83A3-D9F037567BBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8FF71CF-A33E-44A4-83A3-D9F037567BBA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {13DB033A-A8E9-47AA-B511-461FBF4687D6}
+		SolutionGuid = {A6EA16D0-AF7A-4623-8434-78373CDAC57E}
 	EndGlobalSection
 EndGlobal
