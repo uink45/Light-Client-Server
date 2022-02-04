@@ -42,17 +42,10 @@ namespace Lantern
 
         public static void DisplayMessages()
         {
-            Console.Write("\nRunning light client host at ");
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write("https://localhost:5001");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.Write(" and ");
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write("http://localhost:5000. ");
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write("\n\nPlease do not close this window while the light client is running.");
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("\n\nWhen finished using the app, press Ctrl + C (twice) to shut down the hosts.");
+            Console.Write("\n\n** DO NOT CLOSE THIS WINDOW **");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("\n");
         }
     }
 }

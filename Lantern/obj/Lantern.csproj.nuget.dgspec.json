@@ -52,6 +52,18 @@
               "target": "Package",
               "version": "[0.10.12, )"
             },
+            "Avalonia.Native": {
+              "target": "Package",
+              "version": "[0.10.12, )"
+            },
+            "Avalonia.ReactiveUI": {
+              "target": "Package",
+              "version": "[0.10.12, )"
+            },
+            "Avalonia.X11": {
+              "target": "Package",
+              "version": "[0.10.12, )"
+            },
             "Microsoft.Extensions.Logging": {
               "target": "Package",
               "version": "[6.0.0, )"

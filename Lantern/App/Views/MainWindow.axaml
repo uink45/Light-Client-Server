@@ -6,9 +6,7 @@
         x:Class="Lantern.MainWindow"
         Title="Lantern" 
 		TransparencyLevelHint="AcrylicBlur"
-		Background="Transparent"
 		ExtendClientAreaToDecorationsHint="True">
-
 	<Panel>
 		<ExperimentalAcrylicBorder IsHitTestVisible="False">
 			<ExperimentalAcrylicBorder.Material>
@@ -19,6 +17,10 @@
 				</ExperimentalAcrylicMaterial>
 			</ExperimentalAcrylicBorder.Material>
 		</ExperimentalAcrylicBorder>
-	</Panel>
+		<Image Source="/Assets/Logo.png" Height="340" Width="240" HorizontalAlignment="Center" Margin="0,0,0,100"></Image>
+		<Button CornerRadius="6" HorizontalAlignment="Center" Margin="35,260,50,0" MinWidth="100" FontSize="27" FontWeight="SemiBold" Content=" Start" Command="{Binding BuyStartCommand}"/>
 	
+	</Panel>
+
 </Window>
+

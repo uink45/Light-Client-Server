@@ -129,7 +129,6 @@ C:\Users\multi\Documents\Mycelium\Research\Light Client\Implementation\Lantern\L
 C:\Users\multi\Documents\Mycelium\Research\Light Client\Implementation\Lantern\Lantern\obj\Debug\net6.0\Lantern.AssemblyInfoInputs.cache
 C:\Users\multi\Documents\Mycelium\Research\Light Client\Implementation\Lantern\Lantern\obj\Debug\net6.0\Lantern.AssemblyInfo.cs
 C:\Users\multi\Documents\Mycelium\Research\Light Client\Implementation\Lantern\Lantern\obj\Debug\net6.0\Lantern.csproj.CoreCompileInputs.cache
-C:\Users\multi\Documents\Mycelium\Research\Light Client\Implementation\Lantern\Lantern\obj\Debug\net6.0\Lantern.MvcApplicationPartsAssemblyInfo.cache
 C:\Users\multi\Documents\Mycelium\Research\Light Client\Implementation\Lantern\Lantern\obj\Debug\net6.0\staticwebassets.build.json
 C:\Users\multi\Documents\Mycelium\Research\Light Client\Implementation\Lantern\Lantern\obj\Debug\net6.0\staticwebassets.development.json
 C:\Users\multi\Documents\Mycelium\Research\Light Client\Implementation\Lantern\Lantern\obj\Debug\net6.0\scopedcss\bundle\Lantern.styles.css
@@ -138,3 +137,7 @@ C:\Users\multi\Documents\Mycelium\Research\Light Client\Implementation\Lantern\L
 C:\Users\multi\Documents\Mycelium\Research\Light Client\Implementation\Lantern\Lantern\obj\Debug\net6.0\ref\Lantern.dll
 C:\Users\multi\Documents\Mycelium\Research\Light Client\Implementation\Lantern\Lantern\obj\Debug\net6.0\Lantern.pdb
 C:\Users\multi\Documents\Mycelium\Research\Light Client\Implementation\Lantern\Lantern\obj\Debug\net6.0\Lantern.genruntimeconfig.cache
+C:\Users\multi\Documents\Mycelium\Research\Light Client\Implementation\Lantern\Lantern\bin\Debug\net6.0\Avalonia.ReactiveUI.dll
+C:\Users\multi\Documents\Mycelium\Research\Light Client\Implementation\Lantern\Lantern\bin\Debug\net6.0\DynamicData.dll
+C:\Users\multi\Documents\Mycelium\Research\Light Client\Implementation\Lantern\Lantern\bin\Debug\net6.0\ReactiveUI.dll
+C:\Users\multi\Documents\Mycelium\Research\Light Client\Implementation\Lantern\Lantern\bin\Debug\net6.0\Splat.dll
