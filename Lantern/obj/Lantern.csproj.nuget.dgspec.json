@@ -40,33 +40,13 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "dependencies": {
-            "Avalonia": {
+            "LiteDB": {
               "target": "Package",
-              "version": "[0.10.12, )"
+              "version": "[5.0.11, )"
             },
-            "Avalonia.Desktop": {
+            "MudBlazor": {
               "target": "Package",
-              "version": "[0.10.12, )"
-            },
-            "Avalonia.Diagnostics": {
-              "target": "Package",
-              "version": "[0.10.12, )"
-            },
-            "Avalonia.Native": {
-              "target": "Package",
-              "version": "[0.10.12, )"
-            },
-            "Avalonia.ReactiveUI": {
-              "target": "Package",
-              "version": "[0.10.12, )"
-            },
-            "Avalonia.X11": {
-              "target": "Package",
-              "version": "[0.10.12, )"
-            },
-            "Microsoft.Extensions.Logging": {
-              "target": "Package",
-              "version": "[6.0.0, )"
+              "version": "[6.0.6, )"
             },
             "Newtonsoft.Json": {
               "target": "Package",

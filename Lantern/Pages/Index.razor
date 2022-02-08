@@ -1,0 +1,20 @@
+﻿@page "/"
+@inject LightClientService Client
+
+<div>
+    <h1 class="display-4">Lantern.</h1>
+    <p>Consensus Layer Light Client></p>
+    <button type="button" class="btn btn-dark" @onclick="async () => await Launch()" >Launch</button>
+</div>
+
+
+@code {
+    public async Task Launch()
+    {
+        Client.Launch();
+    }
+}
+
+
+
+
