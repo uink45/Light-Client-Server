@@ -1,37 +1,7 @@
-﻿<div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href="">Lantern</a>
-    <button class="navbar-toggler" @onclick="ToggleNavMenu">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-</div>
-
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <ul class="nav flex-column">
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="settings">
-                <span class="oi oi-plus" aria-hidden="true"></span> Settings
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
-            </NavLink>
-        </li>
-    </ul>
-</div>
-
-@code {
-    private bool collapseNavMenu = true;
-
-    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-}
+﻿@*<MudPaper class="acrylic" style="position: fixed; top: 10px; left: 10px;" Height="500px" Width="310px">
+    <MudNavMenu style=" top: -250px; left: -30px;">
+        <MudText style="font-family: 'Paytone One'; color:white; font-size: 250%;">Lantern.</MudText>
+        <MudNavLink Href="/settings" style="font-family: 'Open Sans', sans-serif; font-size: 140%;color:#140841; ">Settings</MudNavLink>
+        <MudNavLink Href="/documentation" style="font-family: 'Open Sans', sans-serif; font-size: 140%; color:#140841; ">Documentation</MudNavLink>
+    </MudNavMenu>
+</MudPaper>*@

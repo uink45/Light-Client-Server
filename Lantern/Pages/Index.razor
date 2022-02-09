@@ -1,18 +1,30 @@
 ﻿@page "/"
 @inject LightClientService Client
 
-<div>
-    <h1 class="display-4">Lantern.</h1>
-    <p>Consensus Layer Light Client></p>
-    <button type="button" class="btn btn-dark" @onclick="async () => await Launch()" >Launch</button>
+<div style="position: fixed; top: 10%; left: 39%; display: flex;" >
+    <h1 style="font-family: 'Paytone One'; color:#140841; font-size: 600%; flex: 1;" class="display-1">Lantern.</h1>
+    <p style=" margin-left: -330px; margin-top: 110px; color:#140841; flex: 10; font-family: 'Open Sans', sans-serif; font-size: 160%; font-weight: normal;">Consensus Layer Light Client</p>
+    <button class="hoverable" type="button" style=" left: -195px; margin-top: 170px; flex: 1;font-size: 120%; font-family: 'Open Sans', sans-serif; border-radius: 7px; border: 1px solid #140841; padding: 12px 15px; " @onclick="async () => await Launch()" >Launch</button>
 </div>
+
+@if (!hidden)
+{
+    <div class="acrylic1" style="position: fixed; right: 100px; top: 350px; width: 500px; height: 200px;" >
+    <MudProgressLinear Color="Color.Dark" Rounded="true" Size="Size.Large" Value="75" style="width: 200px;" />
+    </div>
+}
+
+
 
 
 @code {
+    public bool hidden = false;
     public async Task Launch()
     {
-        Client.Launch();
+        //hidden = false;
+        //Client.Launch();
     }
+
 }
 
 
