@@ -1,0 +1,1 @@
+const PeerIdLocation = ".\\peerId.json";
