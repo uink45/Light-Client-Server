@@ -1,1 +1,0 @@
-const PeerIdLocation = ".\\peerId.json";

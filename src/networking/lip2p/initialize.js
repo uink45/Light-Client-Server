@@ -28,7 +28,7 @@ async function createNodeJsLibp2p(args, networkOpts = {}, nodeJsLibp2pOpts = {})
     const localMultiaddrs = networkOpts.localMultiaddrs || defaultNetworkOptions.localMultiaddrs;
     const bootMultiaddrs = networkOpts.bootMultiaddrs || defaultNetworkOptions.bootMultiaddrs;
     const enr = networkOpts.disv5?.enr;
-    const { peerStoreDir, disablePeerDiscovery } = nodeJsLibp2pOpts;
+    const { peerStoreDir } = nodeJsLibp2pOpts;
     
     if (enr !== undefined && typeof enr !== "string") {
         if (enr instanceof ENR) {
