@@ -1,0 +1,3 @@
+const REQUEST_TIMEOUT = 5000;
+const DIAL_TIMEOUT = 5000;
+
