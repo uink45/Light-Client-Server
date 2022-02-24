@@ -16,7 +16,7 @@ const { collectResponses } = require("./collectResponses");
 
 
 async function submitRequest({libp2p}, peerId, method, encoding, versions, requestBody, maxResponses, signal, requestId = 0){
-    console.log("Req  dialing peer");
+    //console.log("Req  dialing peer");
     try {
         // From Altair block query methods have V1 and V2. Both protocols should be requested.
         // On stream negotiation `libp2p.dialProtocol` will pick the available protocol and return
@@ -54,7 +54,7 @@ async function submitRequest({libp2p}, peerId, method, encoding, versions, reque
         const protocol = protocols.get(protocolId);
         if (!protocol)
             throw Error(`dialProtocol selected unknown protocolId ${protocolId}`);
-        console.log("Req  sending request");
+        //console.log("Req  sending request");
         // Spec: The requester MUST close the write side of the stream once it finishes writing the request message
         // Impl: stream.sink is closed automatically by js-libp2p-mplex when piped source is exhausted
         // REQUEST_TIMEOUT: Non-spec timeout from sending request until write stream closed by responder
@@ -69,7 +69,7 @@ async function submitRequest({libp2p}, peerId, method, encoding, versions, reque
                 throw new RequestInternalError({ code: RequestErrorCode.REQUEST_ERROR, error: e });
             }
         });
-        console.log("Req  request sent");
+        //console.log("Req  request sent");
         try {
             // Note: libp2p.stop() will close all connections, so not necessary to abort this pipe on parent stop
             const responses = await withTimeout(() => it_pipe_1.default(stream.source, responseTimeoutsHandler(responseDecode(protocol)), collectResponses(method, maxResponses)), maxTotalResponseTimeout(maxResponses)).catch((e) => {
@@ -81,7 +81,7 @@ async function submitRequest({libp2p}, peerId, method, encoding, versions, reque
                     throw e; // The error will be typed in the outter catch {} block
                 }
             });
-            console.log("Req  done");
+            //console.log("Req  done");
             return responses;
         }
         finally {
@@ -92,7 +92,6 @@ async function submitRequest({libp2p}, peerId, method, encoding, versions, reque
         }
     }
     catch (e) {
-        
         const metadata = { method, encoding };
         if (e instanceof ResponseError) {
             throw new RequestError(responseStatusErrorToRequestError(e), metadata);
