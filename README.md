@@ -3,5 +3,5 @@
 Run the following commands to start the server:
 ```
 npm install
-node index.js
+npm run start
 ```
