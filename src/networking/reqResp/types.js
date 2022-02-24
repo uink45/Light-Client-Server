@@ -1,4 +1,4 @@
-const lodestar_types_1 = require("@chainsafe/lodestar-types");
+const {ssz} = require("@chainsafe/lodestar-types");
 exports.protocolPrefix = "/eth2/beacon_chain/req";
 /** ReqResp protocol names or methods. Each Method can have multiple versions and encodings */
 var Method;
@@ -82,19 +82,20 @@ exports.contextBytesTypeByProtocol = contextBytesTypeByProtocol;
 /** Request SSZ type for each method and ForkName */
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/explicit-function-return-type
 function getRequestSzzTypeByMethod(method) {
+    
     switch (method) {
         case Method.Status:
-            return lodestar_types_1.ssz.phase0.Status;
+            return ssz.phase0.Status;
         case Method.Goodbye:
-            return lodestar_types_1.ssz.phase0.Goodbye;
+            return ssz.phase0.Goodbye;
         case Method.Ping:
-            return lodestar_types_1.ssz.phase0.Ping;
+            return ssz.phase0.Ping;
         case Method.Metadata:
             return null;
         case Method.BeaconBlocksByRange:
-            return lodestar_types_1.ssz.phase0.BeaconBlocksByRangeRequest;
+            return ssz.phase0.BeaconBlocksByRangeRequest;
         case Method.BeaconBlocksByRoot:
-            return lodestar_types_1.ssz.phase0.BeaconBlocksByRootRequest;
+            return ssz.phase0.BeaconBlocksByRootRequest;
     }
 }
 exports.getRequestSzzTypeByMethod = getRequestSzzTypeByMethod;
@@ -103,20 +104,20 @@ exports.getRequestSzzTypeByMethod = getRequestSzzTypeByMethod;
 function getResponseSzzTypeByMethod(protocol, forkName) {
     switch (protocol.method) {
         case Method.Status:
-            return lodestar_types_1.ssz.phase0.Status;
+            return ssz.phase0.Status;
         case Method.Goodbye:
-            return lodestar_types_1.ssz.phase0.Goodbye;
+            return ssz.phase0.Goodbye;
         case Method.Ping:
-            return lodestar_types_1.ssz.phase0.Ping;
+            return ssz.phase0.Ping;
         case Method.Metadata: {
             // V1 -> phase0.Metadata, V2 -> altair.Metadata
             const fork = protocol.version === Version.V1 ? "phase0" : "altair";
-            return lodestar_types_1.ssz[fork].Metadata;
+            return ssz[fork].Metadata;
         }
         case Method.BeaconBlocksByRange:
         case Method.BeaconBlocksByRoot:
             // SignedBeaconBlock type is changed in altair
-            return lodestar_types_1.ssz[forkName].SignedBeaconBlock;
+        return ssz["phase0"].SignedBeaconBlock;
     }
 }
 exports.getResponseSzzTypeByMethod = getResponseSzzTypeByMethod;
@@ -124,15 +125,15 @@ exports.getResponseSzzTypeByMethod = getResponseSzzTypeByMethod;
 function getOutgoingSerializerByMethod(protocol) {
     switch (protocol.method) {
         case Method.Status:
-            return lodestar_types_1.ssz.phase0.Status;
+            return ssz.phase0.Status;
         case Method.Goodbye:
-            return lodestar_types_1.ssz.phase0.Goodbye;
+            return ssz.phase0.Goodbye;
         case Method.Ping:
-            return lodestar_types_1.ssz.phase0.Ping;
+            return ssz.phase0.Ping;
         case Method.Metadata: {
             // V1 -> phase0.Metadata, V2 -> altair.Metadata
             const fork = protocol.version === Version.V1 ? "phase0" : "altair";
-            return lodestar_types_1.ssz[fork].Metadata;
+            return ssz[fork].Metadata;
         }
         case Method.BeaconBlocksByRange:
         case Method.BeaconBlocksByRoot:

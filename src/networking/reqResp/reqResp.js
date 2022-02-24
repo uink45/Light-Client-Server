@@ -9,8 +9,8 @@ class ReqResp{
         this.reqCount = 0;
         this.controller = new AbortController();
     }
-    async ping(peerId){
-        return await this.sendRequest(peerId, "ping", [Version.V1], 0);
+    async ping(peerId, request){
+        return await this.sendRequest(peerId, "ping", [Version.V1], request);
     }
 
     async status(peerId, request){
@@ -19,6 +19,10 @@ class ReqResp{
 
     async metaData(peerId){
         return await this.sendRequest(peerId, "metadata", [Version.V1], null)
+    }
+
+    async beaconBlocksByRange(peerId, request){
+        return await this.sendRequest(peerId, "beacon_blocks_by_range", [Version.V1], request);
     }
 
     async sendRequest(peerId, method, versions, body, maxResponses = 1){
