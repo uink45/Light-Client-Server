@@ -1,4 +1,8 @@
-
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 const bl_1 = __importDefault(require("bl"));
 const varint_1 = __importDefault(require("varint"));
 const { MAX_VARINT_BYTES } = require("../configuration");

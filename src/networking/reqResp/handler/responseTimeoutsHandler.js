@@ -1,10 +1,14 @@
-
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 const { TTFB_TIMEOUT, RESP_TIMEOUT } = require("../configuration");
 const { RequestErrorCode, RequestInternalError } = require("../errors");
 const { abortableSource } = require("./abortableSource");
 const { onChunk } = require("./onChunk");
 const abort_controller_1 = require("@chainsafe/abort-controller");
-const it_pipe_1 = require("it-pipe");
+const it_pipe_1 = __importDefault(require("it-pipe"));
 
 
 /** Returns the maximum total timeout possible for a response. See @responseTimeoutsHandler */

@@ -1,11 +1,9 @@
-
-
-const types_1 = require("../types");
 const { ResponseError } = require("./errors");
 const { RespStatus } = require("../errors");
 const { BufferedSource } = require("./bufferedSource");
 const { decodeErrorMessage } = require("./errorMessage");
 const { readEncodedPayload } = require("../encodingStrategies/index");
+const { deserializeToTreeByMethod, contextBytesTypeByProtocol, ContextBytesType, getResponseSzzTypeByMethod } = require("../types");
 /**
  * Internal helper type to signal stream ended early
  */
@@ -22,10 +20,9 @@ var StreamStatus;
  * ```
  */
 function responseDecode(protocol) {
-
     return async function* responseDecodeSink(source) {
-        const deserializeToTree = types_1.deserializeToTreeByMethod[protocol.method];
-        const contextBytesType = (0, types_1.contextBytesTypeByProtocol)(protocol);
+        const deserializeToTree = deserializeToTreeByMethod[protocol.method];
+        const contextBytesType = contextBytesTypeByProtocol(protocol);
         const bufferedSource = new BufferedSource(source);
         // Consumers of `responseDecode()` may limit the number of <response_chunk> and break out of the while loop
         while (!bufferedSource.isDone) {
@@ -41,8 +38,9 @@ function responseDecode(protocol) {
                 const errorMessage = await readErrorMessage(bufferedSource);
                 throw new ResponseError(status, errorMessage);
             }
+            
             const forkName = await readForkName(contextBytesType);
-            const type = (0, types_1.getResponseSzzTypeByMethod)(protocol, forkName);
+            const type = getResponseSzzTypeByMethod(protocol, forkName);
             yield await readEncodedPayload(bufferedSource, protocol.encoding, type, { deserializeToTree });
         }
     };
@@ -100,7 +98,7 @@ exports.readErrorMessage = readErrorMessage;
  */
 async function readForkName(contextBytes) {
     switch (contextBytes) {
-        case types_1.ContextBytesType.Empty:
+        case ContextBytesType.Empty:
             return "phase0";
 
     }

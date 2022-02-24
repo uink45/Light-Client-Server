@@ -1,14 +1,21 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 const { REQUEST_TIMEOUT, DIAL_TIMEOUT } = require("./configuration");
 const { TimeoutError } = require("./timeout/errors");
 const { withTimeout } = require("./timeout/timeout");
 const { formatProtocolId } = require("./utilities");
-const { RequestInternalError, RequestErrorCode} = require("./errors");
+const { RequestInternalError, RequestErrorCode, RequestError, responseStatusErrorToRequestError} = require("./errors");
 const { responseTimeoutsHandler, maxTotalResponseTimeout } = require("./handler/responseTimeoutsHandler");
-const it_pipe_1 = require("it-pipe");
+const it_pipe_1 = __importDefault(require("it-pipe"));
+const { responseDecode } = require("./handler/responseDecode");
+const { requestEncode } = require("./handler/requestEncode");
+const { ResponseError } = require("./handler/errors");
+const { collectResponses } = require("./collectResponses");
 
 
-async function submitRequest({libp2p, forkDigestContext}, peerId, method, encoding, versions, requestBody, maxResponses){
-   
+async function submitRequest({libp2p}, peerId, method, encoding, versions, requestBody, maxResponses, signal, requestId = 0){
     console.log("Req  dialing peer");
     try {
         // From Altair block query methods have V1 and V2. Both protocols should be requested.
@@ -48,12 +55,11 @@ async function submitRequest({libp2p, forkDigestContext}, peerId, method, encodi
         if (!protocol)
             throw Error(`dialProtocol selected unknown protocolId ${protocolId}`);
         console.log("Req  sending request");
-        
         // Spec: The requester MUST close the write side of the stream once it finishes writing the request message
         // Impl: stream.sink is closed automatically by js-libp2p-mplex when piped source is exhausted
         // REQUEST_TIMEOUT: Non-spec timeout from sending request until write stream closed by responder
         // Note: libp2p.stop() will close all connections, so not necessary to abort this pipe on parent stop
-        await withTimeout(() => it_pipe_1.default(requestEncode_1.requestEncode(protocol, requestBody), stream.sink), REQUEST_TIMEOUT, signal).catch((e) => {
+        await withTimeout(() => it_pipe_1.default(requestEncode(protocol, requestBody), stream.sink), REQUEST_TIMEOUT, signal).catch((e) => {
             // Must close the stream read side (stream.source) manually AND the write side
             stream.abort(e);
             if (e instanceof TimeoutError) {
@@ -66,7 +72,7 @@ async function submitRequest({libp2p, forkDigestContext}, peerId, method, encodi
         console.log("Req  request sent");
         try {
             // Note: libp2p.stop() will close all connections, so not necessary to abort this pipe on parent stop
-            const responses = await withTimeout(() => it_pipe_1.default(stream.source, responseTimeoutsHandler(responseDecode_1.responseDecode(forkDigestContext, protocol), options), collectResponses_1.collectResponses(method, maxResponses)), maxTotalResponseTimeout(maxResponses, options)).catch((e) => {
+            const responses = await withTimeout(() => it_pipe_1.default(stream.source, responseTimeoutsHandler(responseDecode(protocol)), collectResponses(method, maxResponses)), maxTotalResponseTimeout(maxResponses)).catch((e) => {
                 // No need to close the stream here, the outter finally {} block will
                 if (e instanceof TimeoutError) {
                     throw new RequestInternalError({ code: RequestErrorCode.RESPONSE_TIMEOUT });
@@ -75,11 +81,7 @@ async function submitRequest({libp2p, forkDigestContext}, peerId, method, encodi
                     throw e; // The error will be typed in the outter catch {} block
                 }
             });
-            // NOTE: Only log once per request to verbose, intermediate steps to debug
-            // NOTE: Do not log the response, logs get extremely cluttered
-            // NOTE: add double space after "Req  " to align log with the "Resp " log
-            const numResponse = Array.isArray(responses) ? responses.length : 1;
-            logger.verbose("Req  done", { ...logCtx, numResponse });
+            console.log("Req  done");
             return responses;
         }
         finally {
@@ -90,12 +92,13 @@ async function submitRequest({libp2p, forkDigestContext}, peerId, method, encodi
         }
     }
     catch (e) {
+        
         const metadata = { method, encoding };
-        if (e instanceof response_1.ResponseError) {
-            throw new errors_1.RequestError(errors_1.responseStatusErrorToRequestError(e), metadata);
+        if (e instanceof ResponseError) {
+            throw new RequestError(responseStatusErrorToRequestError(e), metadata);
         }
-        else if (e instanceof errors_1.RequestInternalError) {
-            throw new errors_1.RequestError(e.type, metadata);
+        else if (e instanceof RequestInternalError) {
+            // new RequestError(e.type, metadata);
         }
         else {
             throw e;

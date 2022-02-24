@@ -1,6 +1,5 @@
 
 const Gossipsub = require("@chainsafe/lodestar/node_modules/libp2p-gossipsub");
-const { createNodeJsLibp2p } = require("./lip2p/initialize");
 const { gossipsubParams } = require("./gossipsub/gossipsub");
 const { ReqResp } = require("./reqResp/reqResp");
 
