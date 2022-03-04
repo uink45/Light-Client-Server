@@ -23,9 +23,11 @@ function getLightclientApi(opts, { chain, config, db }) {
                     item = state.balances[path[1]];
                 }
             }
+            
             // eslint-disable-next-line @typescript-eslint/naming-convention
             const BeaconState = config.getForkTypes(state.slot).BeaconState;
             const stateTreeBacked = BeaconState.createTreeBackedFromStruct(state);
+            
             const tree = stateTreeBacked.tree;
             const gindicesSet = new Set();
             for (const path of paths) {

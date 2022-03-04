@@ -52,7 +52,7 @@ export function getLightclientApi(
       if (gindicesSet.size > maxGindicesInProof) {
         throw new Error("Requested proof is too large.");
       }
-
+      
       return {
         data: tree.getProof({
           type: ProofType.treeOffset,
