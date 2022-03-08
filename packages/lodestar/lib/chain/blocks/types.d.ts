@@ -36,6 +36,10 @@ export declare type PartiallyVerifiedBlockFlags = FullyVerifiedBlockFlags & {
      * From RangeSync module, we won't attest to this block so it's okay to ignore a SYNCING message from execution layer
      */
     fromRangeSync?: boolean;
+    /**
+     * Verify signatures on main thread or not.
+     */
+    blsVerifyOnMainThread?: boolean;
 };
 /**
  * A wrapper around a `SignedBeaconBlock` that indicates that this block is fully verified and ready to import

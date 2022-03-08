@@ -3,7 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.defaultChainOptions = void 0;
 const lodestar_params_1 = require("@chainsafe/lodestar-params");
 exports.defaultChainOptions = {
-    useSingleThreadVerifier: false,
+    blsVerifyAllMainThread: false,
+    blsVerifyAllMultiThread: false,
     disableBlsBatchVerify: false,
     persistInvalidSszObjects: true,
     persistInvalidSszObjectsDir: "",

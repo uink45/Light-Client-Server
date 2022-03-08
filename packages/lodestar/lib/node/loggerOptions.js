@@ -27,6 +27,10 @@ exports.defaultLoggerOptions = {
         level: lodestar_utils_1.LogLevel[lodestar_utils_1.defaultLogLevel],
         module: "sync",
     },
+    backfill: {
+        level: lodestar_utils_1.LogLevel[lodestar_utils_1.defaultLogLevel],
+        module: "backfill",
+    },
     api: {
         level: lodestar_utils_1.LogLevel[lodestar_utils_1.defaultLogLevel],
         module: "api",

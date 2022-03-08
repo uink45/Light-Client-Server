@@ -7,5 +7,5 @@ export declare type ChainTarget = {
     slot: Slot;
     root: Root;
 };
-export declare function computeMostCommonTarget(targets: ChainTarget[]): ChainTarget | null;
+export declare function computeMostCommonTarget(targets: ChainTarget[]): ChainTarget;
 //# sourceMappingURL=chainTarget.d.ts.map

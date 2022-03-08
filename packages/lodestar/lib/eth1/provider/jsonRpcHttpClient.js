@@ -9,6 +9,7 @@ exports.HttpRpcError = exports.ErrorJsonRpcResponse = exports.ErrorParseJson = e
 const cross_fetch_1 = __importDefault(require("cross-fetch"));
 const abort_controller_1 = require("@chainsafe/abort-controller");
 const lodestar_utils_1 = require("@chainsafe/lodestar-utils");
+const jwt_1 = require("./jwt");
 /**
  * Limits the amount of response text printed with RPC or parsing errors
  */
@@ -28,6 +29,7 @@ class JsonRpcHttpClient {
                 throw Error(`JsonRpcHttpClient.urls[${i}] is empty or undefined: ${url}`);
             }
         }
+        this.jwtSecret = opts === null || opts === void 0 ? void 0 : opts.jwtSecret;
     }
     /**
      * Perform RPC request
@@ -90,10 +92,23 @@ class JsonRpcHttpClient {
             this.opts.signal.addEventListener("abort", onParentSignalAbort, { once: true });
         }
         try {
+            const headers = { "Content-Type": "application/json" };
+            if (this.jwtSecret) {
+                /**
+                 * ELs have a tight +-5 second freshness check on token's iat i.e. issued at
+                 * so its better to generate a new token each time. Currently iat is the only claim
+                 * we are encoding but potentially we can encode more claims.
+                 * Also currently the algorithm for the token generation is mandated to HS256
+                 *
+                 * Jwt auth spec: https://github.com/ethereum/execution-apis/pull/167
+                 */
+                const token = (0, jwt_1.encodeJwtToken)({ iat: Math.floor(new Date().getTime() / 1000) }, this.jwtSecret);
+                headers["Authorization"] = `Bearer ${token}`;
+            }
             const res = await (0, cross_fetch_1.default)(url, {
                 method: "post",
                 body: JSON.stringify(json),
-                headers: { "Content-Type": "application/json" },
+                headers,
                 signal: controller.signal,
             }).finally(() => {
                 var _a, _b;

@@ -27,7 +27,7 @@ const executionPayloadFields = {
     stateRoot: Bytes32,
     receiptsRoot: Bytes32,
     logsBloom: new ssz_1.ByteVectorType({ length: lodestar_params_1.BYTES_PER_LOGS_BLOOM }),
-    random: Bytes32,
+    prevRandao: Bytes32,
     blockNumber: Number64,
     gasLimit: Number64,
     gasUsed: Number64,
@@ -44,7 +44,7 @@ const executionPayloadCasingMap = {
     stateRoot: "state_root",
     receiptsRoot: "receipts_root",
     logsBloom: "logs_bloom",
-    random: "random",
+    prevRandao: "prev_randao",
     blockNumber: "block_number",
     gasLimit: "gas_limit",
     gasUsed: "gas_used",
@@ -62,7 +62,7 @@ const executionPayloadCasingMap = {
  *     state_root: Bytes32
  *     receipt_root: Bytes32  # 'receipts root' in the yellow paper
  *     logs_bloom: ByteVector[BYTES_PER_LOGS_BLOOM]
- *     random: Bytes32  # 'difficulty' in the yellow paper
+ *     prevRandao: Bytes32  # 'difficulty' in the yellow paper
  *     block_number: uint64  # 'number' in the yellow paper
  *     gas_limit: uint64
  *     gas_used: uint64

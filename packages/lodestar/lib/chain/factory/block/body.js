@@ -85,10 +85,10 @@ async function prepareExecutionPayload(chain, finalizedBlockHash, state, suggest
         parentHash = state.latestExecutionPayloadHeader.blockHash;
     }
     const timestamp = (0, lodestar_beacon_state_transition_1.computeTimeAtSlot)(chain.config, state.slot, state.genesisTime);
-    const random = (0, lodestar_beacon_state_transition_1.getRandaoMix)(state, state.currentShuffling.epoch);
+    const prevRandao = (0, lodestar_beacon_state_transition_1.getRandaoMix)(state, state.currentShuffling.epoch);
     const payloadId = await chain.executionEngine.notifyForkchoiceUpdate(parentHash, finalizedBlockHash, {
         timestamp,
-        random,
+        prevRandao,
         suggestedFeeRecipient,
     });
     if (!payloadId)

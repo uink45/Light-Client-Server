@@ -28,4 +28,5 @@ __exportStar(require("./sleep"), exports);
 __exportStar(require("./stripOffNewlines"), exports);
 __exportStar(require("./types"), exports);
 __exportStar(require("./bls"), exports);
+__exportStar(require("./jwt"), exports);
 //# sourceMappingURL=index.js.map

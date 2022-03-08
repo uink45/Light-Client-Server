@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getRangeSyncType = exports.RangeSyncType = exports.getPeerSyncType = exports.PeerSyncType = void 0;
+exports.getRangeSyncType = exports.rangeSyncTypes = exports.RangeSyncType = exports.getPeerSyncType = exports.peerSyncTypes = exports.PeerSyncType = void 0;
 /** The type of peer relative to our current state */
 var PeerSyncType;
 (function (PeerSyncType) {
@@ -11,6 +11,8 @@ var PeerSyncType;
     /** A peer is behind in the sync and not useful to us for downloading blocks */
     PeerSyncType["Behind"] = "Behind";
 })(PeerSyncType = exports.PeerSyncType || (exports.PeerSyncType = {}));
+// Cache Object.keys iteration for faster loops in metrics
+exports.peerSyncTypes = Object.keys(PeerSyncType);
 function getPeerSyncType(local, remote, forkChoice, slotImportTolerance) {
     // Aux vars: Inclusive boundaries of the range to consider a peer's head synced to ours.
     const nearRangeStart = local.headSlot - slotImportTolerance;
@@ -70,6 +72,8 @@ var RangeSyncType;
     /** A head chain sync should be started with this peer */
     RangeSyncType["Head"] = "Head";
 })(RangeSyncType = exports.RangeSyncType || (exports.RangeSyncType = {}));
+// Cache Object.keys iteration for faster loops in metrics
+exports.rangeSyncTypes = Object.keys(RangeSyncType);
 /**
  * Check if a peer requires a finalized chain sync. Only if:
  * - The remotes finalized epoch is greater than our current finalized epoch and we have

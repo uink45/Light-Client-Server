@@ -14,6 +14,7 @@ const queue_1 = require("../../../util/queue");
 const types_1 = require("./types");
 const utils_1 = require("./utils");
 const utils_2 = require("../utils");
+const maybeBatch_1 = require("../maybeBatch");
 /**
  * Split big signature sets into smaller sets so they can be sent to multiple workers.
  *
@@ -57,7 +58,8 @@ var WorkerStatusCode;
  *   sets into packages of work and send at once to a worker to distribute the latency cost
  */
 class BlsMultiThreadWorkerPool {
-    constructor(modules) {
+    constructor(options, modules) {
+        var _a;
         this.jobs = [];
         this.bufferedJobs = null;
         /**
@@ -180,6 +182,7 @@ class BlsMultiThreadWorkerPool {
         this.logger = logger;
         this.metrics = metrics;
         this.signal = signal;
+        this.blsVerifyAllMultiThread = (_a = options.blsVerifyAllMultiThread) !== null && _a !== void 0 ? _a : false;
         // TODO: Allow to customize implementation
         const implementation = bls_1.bls.implementation;
         // Use compressed for herumi for now.
@@ -198,6 +201,21 @@ class BlsMultiThreadWorkerPool {
         }
     }
     async verifySignatureSets(sets, opts = {}) {
+        var _a;
+        if (opts.verifyOnMainThread && !this.blsVerifyAllMultiThread) {
+            const timer = (_a = this.metrics) === null || _a === void 0 ? void 0 : _a.blsThreadPool.mainThreadDurationInThreadPool.startTimer();
+            try {
+                return (0, maybeBatch_1.verifySignatureSetsMaybeBatch)(sets.map((set) => ({
+                    publicKey: (0, utils_2.getAggregatedPubkey)(set),
+                    message: set.signingRoot.valueOf(),
+                    signature: set.signature,
+                })));
+            }
+            finally {
+                if (timer)
+                    timer();
+            }
+        }
         // Split large array of sets into smaller.
         // Very helpful when syncing finalized, sync may submit +1000 sets so chunkify allows to distribute to many workers
         const results = await Promise.all((0, utils_1.chunkifyMaximizeChunkSize)(sets, MAX_SIGNATURE_SETS_PER_JOB).map((setsWorker) => this.queueBlsWork({

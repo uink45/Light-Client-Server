@@ -108,7 +108,7 @@ async function validateGossipBlock(config, chain, signedBlock, fork) {
     // [REJECT] The proposer signature, signed_beacon_block.signature, is valid with respect to the proposer_index pubkey.
     const signatureSet = lodestar_beacon_state_transition_2.allForks.getProposerSignatureSet(blockState, signedBlock);
     // Don't batch so verification is not delayed
-    if (!(await chain.bls.verifySignatureSets([signatureSet]))) {
+    if (!(await chain.bls.verifySignatureSets([signatureSet], { verifyOnMainThread: true }))) {
         throw new errors_1.BlockGossipError(errors_1.GossipAction.REJECT, peers_1.PeerAction.LowToleranceError, {
             code: errors_1.BlockErrorCode.PROPOSAL_SIGNATURE_INVALID,
         });

@@ -105,6 +105,7 @@ export declare class RangeSync extends RangeSync_base {
     private onSyncChainEnd;
     private addPeerOrCreateChain;
     private update;
+    private scrapeMetrics;
 }
 export {};
 //# sourceMappingURL=range.d.ts.map

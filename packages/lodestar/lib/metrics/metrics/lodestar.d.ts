@@ -39,6 +39,7 @@ export declare function createLodestarMetrics(register: RegistryMetricCreator, m
     gossipPeer: {
         scoreByThreshold: import("../utils/gauge").GaugeExtra<"threshold">;
         score: import("../utils/avgMinMax").AvgMinMax<string>;
+        scoreWeights: import("../utils/avgMinMax").AvgMinMax<"p" | "topic">;
     };
     gossipMesh: {
         peersByType: import("../utils/gauge").GaugeExtra<"type" | "fork">;
@@ -85,9 +86,20 @@ export declare function createLodestarMetrics(register: RegistryMetricCreator, m
         batchSigsSuccess: import("../utils/gauge").GaugeExtra<string>;
         latencyToWorker: import("../utils/histogram").HistogramExtra<string>;
         latencyFromWorker: import("../utils/histogram").HistogramExtra<string>;
+        mainThreadDurationInThreadPool: import("../utils/histogram").HistogramExtra<string>;
     };
-    syncChainsStarted: import("../utils/gauge").GaugeExtra<"syncType">;
+    blsSingleThread: {
+        singleThreadDuration: import("../utils/histogram").HistogramExtra<string>;
+    };
     syncStatus: import("../utils/gauge").GaugeExtra<string>;
+    syncPeersBySyncType: import("../utils/gauge").GaugeExtra<"syncType">;
+    syncSwitchGossipSubscriptions: import("../utils/gauge").GaugeExtra<"action">;
+    syncRange: {
+        syncChainsEvents: import("../utils/gauge").GaugeExtra<"syncType" | "event">;
+        syncChains: import("../utils/gauge").GaugeExtra<"syncType">;
+        syncChainsPeers: import("../utils/avgMinMax").AvgMinMax<"syncType">;
+        syncChainHighestTargetSlotCompleted: import("../utils/gauge").GaugeExtra<string>;
+    };
     syncUnknownBlock: {
         requests: import("../utils/gauge").GaugeExtra<string>;
         pendingBlocks: import("../utils/gauge").GaugeExtra<string>;
@@ -173,6 +185,9 @@ export declare function createLodestarMetrics(register: RegistryMetricCreator, m
         waitTimeBeforeResolve: import("../utils/gauge").GaugeExtra<string>;
         reject: import("../utils/gauge").GaugeExtra<"reason">;
         waitTimeBeforeReject: import("../utils/gauge").GaugeExtra<"reason">;
+    };
+    lightclientServer: {
+        persistedUpdates: import("../utils/gauge").GaugeExtra<"type">;
     };
 };
 //# sourceMappingURL=lodestar.d.ts.map

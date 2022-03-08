@@ -16,11 +16,24 @@ export declare class JsonRpcHttpClient implements IJsonRpcHttpClient {
     private readonly urls;
     private readonly opts?;
     private id;
+    /**
+     * Optional: If provided, use this jwt secret to HS256 encode and add a jwt token in the
+     * request header which can be authenticated by the RPC server to provide access.
+     * A fresh token is generated on each requests as EL spec mandates the ELs to check
+     * the token freshness +-5 seconds (via `iat` property of the token claim)
+     */
+    private jwtSecret?;
     constructor(urls: string[], opts?: {
         signal?: AbortSignal | undefined;
         timeout?: number | undefined;
         /** If returns true, do not fallback to other urls and throw early */
         shouldNotFallback?: ((error: Error) => boolean) | undefined;
+        /**
+         * If provided, the requests to the RPC server will be bundled with a HS256 encoded
+         * token using this secret. Otherwise the requests to the RPC server will be unauthorized
+         * and it might deny responses to the RPC requests.
+         */
+        jwtSecret?: Uint8Array | undefined;
     } | undefined);
     /**
      * Perform RPC request

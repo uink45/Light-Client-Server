@@ -15,15 +15,15 @@ function getRoutes(config, api) {
             ...serverRoutes.getStateProof,
             handler: async (req) => {
                 const args = reqSerializers.getStateProof.parseReq(req);
-                const { data: proof, value } = await api.getStateProof(...args);
+                const { leaf, singleProof, gindex, value } = await api.getStateProof(...args);
                 // Fastify 3.x.x will automatically add header `Content-Type: application/octet-stream` if Buffer
-                var proofs = proof;
-                var array = []
-                for(let i = 0; i < proofs.leaves.length; i++){
-                    array.push(toHexString(proofs.leaves[i]))
+                var proof = []
+                for(let i = 0; i < singleProof.length; i++){
+                    proof.push(toHexString(singleProof[i]))
                 }
-                proofs.leaves = array;
-                return {proofs, value};
+                var index = BigInt(gindex).toString();          
+                var stringLeaf = toHexString(leaf);
+                return {stringLeaf,proof,index,value};
             },
         },
     };

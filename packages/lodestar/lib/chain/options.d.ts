@@ -1,6 +1,7 @@
 import { ForkChoiceOpts } from "./forkChoice";
 export declare type IChainOptions = BlockProcessOpts & ForkChoiceOpts & {
-    useSingleThreadVerifier?: boolean;
+    blsVerifyAllMainThread?: boolean;
+    blsVerifyAllMultiThread?: boolean;
     persistInvalidSszObjects?: boolean;
     persistInvalidSszObjectsDir: string;
 };

@@ -14,6 +14,5 @@ __exportStar(require("./batches"), exports);
 __exportStar(require("./chainTarget"), exports);
 __exportStar(require("./hashBlocks"), exports);
 __exportStar(require("./peerBalancer"), exports);
-__exportStar(require("./shouldRemoveChain"), exports);
 __exportStar(require("./updateChains"), exports);
 //# sourceMappingURL=index.js.map

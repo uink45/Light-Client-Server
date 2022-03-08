@@ -16,8 +16,8 @@ function processExecutionPayload(state, payload, executionEngine) {
     }
     // Verify random
     const expectedRandom = (0, util_1.getRandaoMix)(state, state.currentShuffling.epoch);
-    if (!(0, ssz_1.byteArrayEquals)(payload.random, expectedRandom)) {
-        throw Error(`Invalid execution payload random ${(0, ssz_1.toHexString)(payload.random)} expected=${(0, ssz_1.toHexString)(expectedRandom)}`);
+    if (!(0, ssz_1.byteArrayEquals)(payload.prevRandao, expectedRandom)) {
+        throw Error(`Invalid execution payload random ${(0, ssz_1.toHexString)(payload.prevRandao)} expected=${(0, ssz_1.toHexString)(expectedRandom)}`);
     }
     // Verify timestamp
     //
@@ -43,7 +43,7 @@ function processExecutionPayload(state, payload, executionEngine) {
         stateRoot: payload.stateRoot,
         receiptsRoot: payload.receiptsRoot,
         logsBloom: payload.logsBloom,
-        random: payload.random,
+        prevRandao: payload.prevRandao,
         blockNumber: payload.blockNumber,
         gasLimit: payload.gasLimit,
         gasUsed: payload.gasUsed,

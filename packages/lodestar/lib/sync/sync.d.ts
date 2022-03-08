@@ -5,9 +5,12 @@ export declare class BeaconSync implements IBeaconSync {
     private readonly logger;
     private readonly network;
     private readonly chain;
+    private readonly metrics;
     private readonly opts;
     private readonly rangeSync;
     private readonly unknownBlockSync;
+    /** For metrics only */
+    private readonly peerSyncType;
     /**
      * The number of slots ahead of us that is allowed before starting a RangeSync
      * If a peer is within this tolerance (forwards or backwards), it is treated as a fully sync'd peer.
@@ -46,5 +49,6 @@ export declare class BeaconSync implements IBeaconSync {
      */
     private updateSyncState;
     private onClockEpoch;
+    private scrapeMetrics;
 }
 //# sourceMappingURL=sync.d.ts.map

@@ -37,13 +37,15 @@ export declare const beaconNodeOptions: {
     "metrics.listenAddr": import("yargs").Options;
     "execution.urls": import("yargs").Options;
     "execution.timeout": import("yargs").Options;
+    "jwt-secret": import("yargs").Options;
     "eth1.enabled": import("yargs").Options;
     "eth1.providerUrl": import("yargs").Options;
     "eth1.providerUrls": import("yargs").Options;
     "eth1.depositContractDeployBlock": import("yargs").Options;
     "eth1.disableEth1DepositDataTracker": import("yargs").Options;
     "eth1.unsafeAllowDepositDataOverwrite": import("yargs").Options;
-    "chain.useSingleThreadVerifier": import("yargs").Options;
+    "chain.blsVerifyAllMultiThread": import("yargs").Options;
+    "chain.blsVerifyAllMainThread": import("yargs").Options;
     "chain.disableBlsBatchVerify": import("yargs").Options;
     "chain.persistInvalidSszObjects": import("yargs").Options;
     "chain.proposerBoostEnabled": import("yargs").Options;

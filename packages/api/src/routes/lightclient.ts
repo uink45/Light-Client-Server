@@ -46,8 +46,6 @@ export type Api = {
    * unless to get the very first head update after syncing, or if SSE are not supported by the server.
    */
   getHeadUpdate(): Promise<{data: LightclientHeaderUpdate}>;
-
-  getHeadUpdateBySlot(slot: string): Promise<{data: LightclientHeaderUpdate}>;
   /**
    * Fetch a snapshot with a proof to a trusted block root.
    * The trusted block root should be fetched with similar means to a weak subjectivity checkpoint.
@@ -63,7 +61,6 @@ export const routesData: RoutesData<Api> = {
   getStateProof: {url: "/eth/v1/lightclient/proof/:stateId", method: "GET"},
   getCommitteeUpdates: {url: "/eth/v1/lightclient/committee_updates", method: "GET"},
   getHeadUpdate: {url: "/eth/v1/lightclient/head_update/", method: "GET"},
-  getHeadUpdateBySlot: {url: "/eth/v1/lightclient/head_update_by_slot/:slot", method: "GET"},
   getSnapshot: {url: "/eth/v1/lightclient/snapshot/:blockRoot", method: "GET"},
 };
 
@@ -71,7 +68,6 @@ export type ReqTypes = {
   getStateProof: {params: {stateId: string}; query: {paths: string[]}};
   getCommitteeUpdates: {query: {from: number; to: number}};
   getHeadUpdate: ReqEmpty;
-  getHeadUpdateBySlot: {params: {slot: string}};
   getSnapshot: {params: {blockRoot: string}};
 };
 
@@ -90,12 +86,6 @@ export function getReqSerializers(): ReqSerializers<Api, ReqTypes> {
     },
 
     getHeadUpdate: reqEmpty,
-
-    getHeadUpdateBySlot: {
-      writeReq: (slot) => ({params: {slot}}),
-      parseReq: ({params}) => [params.slot],
-      schema: {params: {slot: Schema.StringRequired}},
-    },
 
     getSnapshot: {
       writeReq: (blockRoot) => ({params: {blockRoot}}),
@@ -136,7 +126,6 @@ export function getReturnTypes(): ReturnTypes<Api> {
     getStateProof: sameType(),
     getCommitteeUpdates: ContainerData(ArrayOf(ssz.altair.LightClientUpdate)),
     getHeadUpdate: ContainerData(lightclientHeaderUpdate),
-    getHeadUpdateBySlot: ContainerData(lightclientHeaderUpdate),
     getSnapshot: ContainerData(lightclientSnapshotWithProofType),
   };
 }

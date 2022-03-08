@@ -17,6 +17,7 @@ exports.BeaconNode = exports.BeaconNodeStatus = void 0;
 const abort_controller_1 = require("@chainsafe/abort-controller");
 const network_1 = require("../network");
 const sync_1 = require("../sync");
+const backfill_1 = require("../sync/backfill");
 const chain_1 = require("../chain");
 const metrics_1 = require("../metrics");
 const api_1 = require("../api");

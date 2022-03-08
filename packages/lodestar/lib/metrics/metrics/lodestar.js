@@ -157,6 +157,11 @@ function createLodestarMetrics(register, metadata, anchorState) {
                 name: "lodestar_gossip_score_avg_min_max",
                 help: "Avg min max of all gossip peer scores",
             }),
+            scoreWeights: register.avgMinMax({
+                name: "lodestar_gossip_score_weights_avg_min_max",
+                help: "Avg min max of all gossip peer score weights",
+                labelNames: ["p", "topic"],
+            }),
         },
         gossipMesh: {
             peersByType: register.gauge({
@@ -272,7 +277,7 @@ function createLodestarMetrics(register, metadata, anchorState) {
             help: "Time to fullfill a request to the REST api labeled by operationId",
             labelNames: ["operationId"],
             // Request times range between 1ms to 100ms in normal conditions. Can get to 1-5 seconds if overloaded
-            buckets: [0.01, 0.1, 0.5, 1, 5, 10],
+            buckets: [0.01, 0.1, 1],
         }),
         // Beacon state transition metrics
         stfnEpochTransition: register.histogram({
@@ -342,17 +347,56 @@ function createLodestarMetrics(register, metadata, anchorState) {
                 help: "Time from the worker sending the result and the main thread receiving it",
                 buckets: [0.1],
             }),
+            mainThreadDurationInThreadPool: register.histogram({
+                name: "lodestar_bls_thread_pool_main_thread_time_seconds",
+                help: "Time to verify signatures in main thread with thread pool mode",
+                buckets: [0.1, 1],
+            }),
+        },
+        // BLS time on single thread mode
+        blsSingleThread: {
+            singleThreadDuration: register.histogram({
+                name: "lodestar_bls_single_thread_time_seconds",
+                help: "Time to verify signatures with single thread mode",
+                buckets: [0.1, 1],
+            }),
         },
         // Sync
-        syncChainsStarted: register.gauge({
-            name: "lodestar_sync_chains_started_total",
-            help: "Total number of sync chains started events, labeled by syncType",
-            labelNames: ["syncType"],
-        }),
         syncStatus: register.gauge({
             name: "lodestar_sync_status",
             help: "Range sync status: [Stalled, SyncingFinalized, SyncingHead, Synced]",
         }),
+        syncPeersBySyncType: register.gauge({
+            name: "lodestar_sync_range_sync_peers",
+            help: "Count of peers by sync type [FullySynced, Advanced, Behind]",
+            labelNames: ["syncType"],
+        }),
+        syncSwitchGossipSubscriptions: register.gauge({
+            name: "lodestar_sync_switch_gossip_subscriptions",
+            help: "Sync switched gossip subscriptions on/off",
+            labelNames: ["action"],
+        }),
+        syncRange: {
+            syncChainsEvents: register.gauge({
+                name: "lodestar_sync_chains_events_total",
+                help: "Total number of sync chains events events, labeled by syncType",
+                labelNames: ["syncType", "event"],
+            }),
+            syncChains: register.gauge({
+                name: "lodestar_sync_chains_count",
+                help: "Count of sync chains by syncType",
+                labelNames: ["syncType"],
+            }),
+            syncChainsPeers: register.avgMinMax({
+                name: "lodestar_sync_chains_peer_count_by_type",
+                help: "Count of sync chain peers by syncType",
+                labelNames: ["syncType"],
+            }),
+            syncChainHighestTargetSlotCompleted: register.gauge({
+                name: "lodestar_sync_chain_highest_target_slot_completed",
+                help: "Highest target slot completed by a sync chain",
+            }),
+        },
         syncUnknownBlock: {
             requests: register.gauge({
                 name: "lodestar_sync_unknown_block_requests_total",
@@ -485,6 +529,7 @@ function createLodestarMetrics(register, metadata, anchorState) {
                 name: "validator_monitor_prev_epoch_attestations_min_delay_seconds",
                 help: "The min delay between when the validator should send the attestation and when it was received",
                 labelNames: ["index"],
+                buckets: [0.1, 1],
             }),
             prevEpochAttestationAggregateInclusions: register.gauge({
                 name: "validator_monitor_prev_epoch_attestation_aggregate_inclusions_total",
@@ -510,6 +555,7 @@ function createLodestarMetrics(register, metadata, anchorState) {
                 name: "validator_monitor_prev_epoch_beacon_blocks_min_delay_seconds",
                 help: "The min delay between when the validator should send the block and when it was received",
                 labelNames: ["index"],
+                buckets: [0.1, 1],
             }),
             prevEpochAggregatesTotal: register.gauge({
                 name: "validator_monitor_prev_epoch_aggregates_total",
@@ -520,6 +566,7 @@ function createLodestarMetrics(register, metadata, anchorState) {
                 name: "validator_monitor_prev_epoch_aggregates_min_delay_seconds",
                 help: "The min delay between when the validator should send the aggregate and when it was received",
                 labelNames: ["index"],
+                buckets: [0.1, 1],
             }),
             // Validator Monitor Metrics (real-time)
             unaggregatedAttestationTotal: register.gauge({
@@ -531,6 +578,7 @@ function createLodestarMetrics(register, metadata, anchorState) {
                 name: "validator_monitor_unaggregated_attestation_delay_seconds",
                 help: "The delay between when the validator should send the attestation and when it was received",
                 labelNames: ["index", "src"],
+                buckets: [0.1, 1],
             }),
             aggregatedAttestationTotal: register.gauge({
                 name: "validator_monitor_aggregated_attestation_total",
@@ -541,6 +589,7 @@ function createLodestarMetrics(register, metadata, anchorState) {
                 name: "validator_monitor_aggregated_attestation_delay_seconds",
                 help: "The delay between then the validator should send the aggregate and when it was received",
                 labelNames: ["index", "src"],
+                buckets: [0.1, 1],
             }),
             attestationInAggregateTotal: register.gauge({
                 name: "validator_monitor_attestation_in_aggregate_total",
@@ -551,6 +600,7 @@ function createLodestarMetrics(register, metadata, anchorState) {
                 name: "validator_monitor_attestation_in_aggregate_delay_seconds",
                 help: "The delay between when the validator should send the aggregate and when it was received",
                 labelNames: ["index", "src"],
+                buckets: [0.1, 1],
             }),
             attestationInBlockTotal: register.gauge({
                 name: "validator_monitor_attestation_in_block_total",
@@ -561,6 +611,7 @@ function createLodestarMetrics(register, metadata, anchorState) {
                 name: "validator_monitor_attestation_in_block_delay_slots",
                 help: "The excess slots (beyond the minimum delay) between the attestation slot and the block slot",
                 labelNames: ["index"],
+                buckets: [0.1, 1],
             }),
             beaconBlockTotal: register.gauge({
                 name: "validator_monitor_beacon_block_total",
@@ -571,6 +622,7 @@ function createLodestarMetrics(register, metadata, anchorState) {
                 name: "validator_monitor_beacon_block_delay_seconds",
                 help: "The delay between when the validator should send the block and when it was received",
                 labelNames: ["index", "src"],
+                buckets: [0.1, 1],
             }),
         },
         // regen metrics
@@ -693,6 +745,13 @@ function createLodestarMetrics(register, metadata, anchorState) {
             waitTimeBeforeReject: register.gauge({
                 name: "lodestar_reprocess_attestations_wait_time_reject_seconds",
                 help: "Time to wait for unknown block before being rejected",
+            }),
+        },
+        lightclientServer: {
+            persistedUpdates: register.gauge({
+                name: "lodestar_lightclient_server_persisted_updates_total",
+                help: "Total number of persisted updates by finalized type",
+                labelNames: ["type"],
             }),
         },
     };

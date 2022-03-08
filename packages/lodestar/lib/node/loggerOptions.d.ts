@@ -6,6 +6,7 @@ export interface IBeaconLoggerOptions {
     node: ILoggerOptions;
     network: ILoggerOptions;
     sync: ILoggerOptions;
+    backfill: ILoggerOptions;
     api: ILoggerOptions;
     metrics: ILoggerOptions;
 }

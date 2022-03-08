@@ -35,9 +35,6 @@ export declare type Api = {
     getHeadUpdate(): Promise<{
         data: LightclientHeaderUpdate;
     }>;
-    getHeadUpdateBySlot(slot: string): Promise<{
-        data: LightclientHeaderUpdate;
-    }>;
     /**
      * Fetch a snapshot with a proof to a trusted block root.
      * The trusted block root should be fetched with similar means to a weak subjectivity checkpoint.
@@ -67,11 +64,6 @@ export declare type ReqTypes = {
         };
     };
     getHeadUpdate: ReqEmpty;
-    getHeadUpdateBySlot: {
-        params: {
-            slot: string;
-        };
-    };
     getSnapshot: {
         params: {
             blockRoot: string;

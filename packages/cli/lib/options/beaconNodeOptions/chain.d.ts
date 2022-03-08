@@ -1,7 +1,8 @@
 import { IBeaconNodeOptions } from "@chainsafe/lodestar";
 import { ICliCommandOptions } from "../../util";
 export interface IChainArgs {
-    "chain.useSingleThreadVerifier": boolean;
+    "chain.blsVerifyAllMultiThread": boolean;
+    "chain.blsVerifyAllMainThread": boolean;
     "chain.disableBlsBatchVerify": boolean;
     "chain.persistInvalidSszObjects": boolean;
     "chain.proposerBoostEnabled": boolean;

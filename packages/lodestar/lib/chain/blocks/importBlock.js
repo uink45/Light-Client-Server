@@ -10,6 +10,11 @@ const stateCache_1 = require("../stateCache");
 const emitter_1 = require("../emitter");
 const checkpoint_1 = require("./utils/checkpoint");
 const pendingEvents_1 = require("./utils/pendingEvents");
+// import {ForkChoiceError, ForkChoiceErrorCode} from "@chainsafe/lodestar-fork-choice/lib/forkChoice/errors";
+/**
+ * Fork-choice allows to import attestations from current (0) or past (1) epoch.
+ */
+const FORK_CHOICE_ATT_EPOCH_LIMIT = 1;
 /**
  * Imports a fully verified block into the chain state. Produces multiple permanent side-effects.
  *
@@ -76,12 +81,16 @@ async function importBlock(chain, fullyVerifiedBlock) {
     chain.forkChoice.onBlock(block.message, postState, onBlockPrecachedData);
     // - Register state and block to the validator monitor
     // TODO
+    const currentEpoch = (0, lodestar_beacon_state_transition_1.computeEpochAtSlot)(chain.forkChoice.getTime());
+    const blockEpoch = (0, lodestar_beacon_state_transition_1.computeEpochAtSlot)(block.message.slot);
     // - For each attestation
     //   - Get indexed attestation
     //   - Register attestation with fork-choice
     //   - Register attestation with validator monitor (only after sync)
-    // Only process attestations in response to an non-prefinalized block
-    if (!skipImportingAttestations) {
+    // Only process attestations of blocks with relevant attestations for the fork-choice:
+    // If current epoch is N, and block is epoch X, block may include attestations for epoch X or X - 1.
+    // The latest block that is useful is at epoch N - 1 which may include attestations for epoch N - 1 or N - 2.
+    if (!skipImportingAttestations && blockEpoch >= currentEpoch - FORK_CHOICE_ATT_EPOCH_LIMIT) {
         const attestations = Array.from((0, ssz_1.readonlyValues)(block.message.body.attestations));
         const rootCache = new lodestar_beacon_state_transition_1.altair.RootCache(postState);
         const parentSlot = (_a = chain.forkChoice.getBlock(block.message.parentRoot)) === null || _a === void 0 ? void 0 : _a.slot;
@@ -89,7 +98,12 @@ async function importBlock(chain, fullyVerifiedBlock) {
         for (const attestation of attestations) {
             try {
                 const indexedAttestation = postState.epochCtx.getIndexedAttestation(attestation);
-                chain.forkChoice.onAttestation(indexedAttestation);
+                const targetEpoch = attestation.data.target.epoch;
+                // Duplicated logic from fork-choice onAttestation validation logic.
+                // Attestations outside of this range will be dropped as Errors, so no need to import
+                if (targetEpoch <= currentEpoch && targetEpoch >= currentEpoch - FORK_CHOICE_ATT_EPOCH_LIMIT) {
+                    chain.forkChoice.onAttestation(indexedAttestation);
+                }
                 if (parentSlot !== undefined) {
                     (_b = chain.metrics) === null || _b === void 0 ? void 0 : _b.registerAttestationInBlock(indexedAttestation, parentSlot, rootCache);
                 }

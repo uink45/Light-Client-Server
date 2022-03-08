@@ -110,7 +110,10 @@ async function verifyBlockStateTransition(chain, partiallyVerifiedBlock, opts) {
         const signatureSets = validProposerSignature
             ? lodestar_beacon_state_transition_1.allForks.getAllBlockSignatureSetsExceptProposer(postState, block)
             : lodestar_beacon_state_transition_1.allForks.getAllBlockSignatureSets(postState, block);
-        if (signatureSets.length > 0 && !(await chain.bls.verifySignatureSets(signatureSets))) {
+        if (signatureSets.length > 0 &&
+            !(await chain.bls.verifySignatureSets(signatureSets, {
+                verifyOnMainThread: partiallyVerifiedBlock === null || partiallyVerifiedBlock === void 0 ? void 0 : partiallyVerifiedBlock.blsVerifyOnMainThread,
+            }))) {
             throw new errors_1.BlockError(block, { code: errors_1.BlockErrorCode.INVALID_SIGNATURE, state: postState });
         }
     }

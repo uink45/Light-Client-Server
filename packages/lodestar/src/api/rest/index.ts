@@ -21,7 +21,7 @@ export type RestApiOptions = {
 export const restApiOptionsDefault: RestApiOptions = {
   enabled: true,
   // ApiNamespace "debug" is not turned on by default
-  api: ["beacon", "lightclient"],
+  api: ["beacon", "config", "events", "node", "validator"],
   host: "127.0.0.1",
   port: 9596,
   cors: "*",

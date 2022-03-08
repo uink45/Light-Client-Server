@@ -15,13 +15,13 @@ export declare type SyncChainFns = {
      * Must return if ALL blocks are processed successfully
      * If SOME blocks are processed must throw BlockProcessorError()
      */
-    processChainSegment: (blocks: allForks.SignedBeaconBlock[]) => Promise<void>;
+    processChainSegment: (blocks: allForks.SignedBeaconBlock[], syncType: RangeSyncType) => Promise<void>;
     /** Must download blocks, and validate their range */
     downloadBeaconBlocksByRange: (peer: PeerId, request: phase0.BeaconBlocksByRangeRequest) => Promise<allForks.SignedBeaconBlock[]>;
     /** Report peer for negative actions. Decouples from the full network instance */
     reportPeer: (peer: PeerId, action: PeerAction, actionName: string) => void;
     /** Hook called when Chain state completes */
-    onEnd: (err?: Error) => void;
+    onEnd: (err: Error | null, target: ChainTarget | null) => void;
 };
 /**
  * Sync this up to this target. Uses slot instead of epoch to re-use logic for finalized sync
@@ -59,8 +59,11 @@ export declare class SyncChain {
     /** Short string id to identify this SyncChain in logs */
     readonly logId: string;
     readonly syncType: RangeSyncType;
-    /** Should sync up until this slot, then stop */
-    target: ChainTarget | null;
+    /**
+     * Should sync up until this slot, then stop.
+     * Finalized SyncChains have a dynamic target, so if this chain has no peers the target can become null
+     */
+    target: ChainTarget;
     /** Number of validated epochs. For the SyncRange to prevent switching chains too fast */
     validatedEpochs: number;
     /** The start of the chain segment. Any epoch previous to this one has been validated. */
@@ -77,7 +80,7 @@ export declare class SyncChain {
     private readonly logger;
     private readonly config;
     private readonly opts;
-    constructor(startEpoch: Epoch, syncType: RangeSyncType, fns: SyncChainFns, modules: SyncChainModules, opts?: SyncChainOpts);
+    constructor(startEpoch: Epoch, initialTarget: ChainTarget, syncType: RangeSyncType, fns: SyncChainFns, modules: SyncChainModules, opts?: SyncChainOpts);
     /**
      * Start syncing a new chain or an old one with an existing peer list
      * In the same call, advance the chain if localFinalizedEpoch >

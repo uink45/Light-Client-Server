@@ -8,6 +8,9 @@ export declare type BlsMultiThreadWorkerPoolModules = {
     metrics: IMetrics | null;
     signal: AbortSignal;
 };
+export declare type BlsMultiThreadWorkerPoolOptions = {
+    blsVerifyAllMultiThread?: boolean;
+};
 /**
  * Wraps "threads" library thread pool queue system with the goals:
  * - Complete total outstanding jobs in total minimum time possible.
@@ -24,7 +27,8 @@ export declare class BlsMultiThreadWorkerPool implements IBlsVerifier {
     private readonly workers;
     private readonly jobs;
     private bufferedJobs;
-    constructor(modules: BlsMultiThreadWorkerPoolModules);
+    private blsVerifyAllMultiThread;
+    constructor(options: BlsMultiThreadWorkerPoolOptions, modules: BlsMultiThreadWorkerPoolModules);
     verifySignatureSets(sets: ISignatureSet[], opts?: VerifySignatureOpts): Promise<boolean>;
     private createWorkers;
     /**

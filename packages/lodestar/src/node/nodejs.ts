@@ -169,7 +169,20 @@ export class BeaconNode {
       logger: logger.child(opts.logger.sync),
     });
 
-    const backfillSync = null;
+    const backfillSync =
+      opts.sync.backfillBatchSize > 0
+        ? await BackfillSync.init(opts.sync, {
+            config,
+            db,
+            chain,
+            metrics,
+            network,
+            wsCheckpoint,
+            anchorState,
+            logger: logger.child(opts.logger.backfill),
+            signal,
+          })
+        : null;
 
     const api = getApi(opts.api, {
       config,
@@ -181,8 +194,12 @@ export class BeaconNode {
       metrics,
     });
 
-    const metricsServer = undefined;
- 
+    const metricsServer = metrics
+      ? new HttpMetricsServer(opts.metrics, {metrics, logger: logger.child(opts.logger.metrics)})
+      : undefined;
+    if (metricsServer) {
+      await metricsServer.start();
+    }
 
     const restApi = new RestApi(opts.api.rest, {
       config,

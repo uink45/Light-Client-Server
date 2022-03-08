@@ -16,7 +16,7 @@ import { IReqResp, IReqRespOptions, ReqRespHandlers } from "./reqresp";
 import { Eth2Gossipsub, GossipHandlers } from "./gossip";
 import { MetadataController } from "./metadata";
 import { IPeerMetadataStore } from "./peers/metastore";
-import { IPeerRpcScoreStore, PeerAction } from "./peers";
+import { PeerAction } from "./peers";
 import { INetworkEventBus } from "./events";
 import { AttnetsService, SyncnetsService, CommitteeSubscription } from "./subnets";
 interface INetworkModules {
@@ -38,7 +38,7 @@ export declare class Network implements INetwork {
     gossip: Eth2Gossipsub;
     metadata: MetadataController;
     peerMetadata: IPeerMetadataStore;
-    peerRpcScores: IPeerRpcScoreStore;
+    private readonly peerRpcScores;
     private readonly peerManager;
     private readonly libp2p;
     private readonly logger;

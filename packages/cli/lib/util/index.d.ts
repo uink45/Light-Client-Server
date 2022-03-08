@@ -16,4 +16,5 @@ export * from "./sleep";
 export * from "./stripOffNewlines";
 export * from "./types";
 export * from "./bls";
+export * from "./jwt";
 //# sourceMappingURL=index.d.ts.map

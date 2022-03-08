@@ -2,10 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getLightclientApi = void 0;
 const utils_1 = require("../beacon/state/utils");
+const utils_2 = require("../beacon/blocks/utils");
 const numpy_1 = require("../../../util/numpy");
 const ssz_1 = require("@chainsafe/ssz");
 const persistent_merkle_tree_1 = require("@chainsafe/persistent-merkle-tree");
-const utils_2 = require("../beacon/blocks/utils");
 const lodestar_beacon_state_transition_1 = require("@chainsafe/lodestar-beacon-state-transition");
 // TODO: Import from lightclient/server package
 function getLightclientApi(opts, { chain, config, db }) {
@@ -15,24 +15,26 @@ function getLightclientApi(opts, { chain, config, db }) {
     const maxGindicesInProof = (_a = opts.maxGindicesInProof) !== null && _a !== void 0 ? _a : 512;
     return {
         async getStateProof(stateId, paths) {
+            
             var item;
-
+            var gIndex;
             const state = await (0, utils_1.resolveStateId)(config, chain, db, stateId);
             for(const path of paths){
                 if(path[0] =="balances"){
                     item = state.balances[path[1]];
                 }
             }
-            
+
             // eslint-disable-next-line @typescript-eslint/naming-convention
             const BeaconState = config.getForkTypes(state.slot).BeaconState;
             const stateTreeBacked = BeaconState.createTreeBackedFromStruct(state);
-            
             const tree = stateTreeBacked.tree;
             const gindicesSet = new Set();
             for (const path of paths) {
+                
                 // Logic from TreeBacked#createProof is (mostly) copied here to expose the # of gindices in the proof
                 const { type, gindex } = BeaconState.getPathInfo(path);
+                gIndex = gindex;
                 if (!(0, ssz_1.isCompositeType)(type)) {
                     gindicesSet.add(gindex);
                 }
@@ -48,10 +50,9 @@ function getLightclientApi(opts, { chain, config, db }) {
                 throw new Error("Requested proof is too large.");
             }
             return {
-                data: tree.getProof({
-                    type: persistent_merkle_tree_1.ProofType.treeOffset,
-                    gindices: Array.from(gindicesSet),
-                }),
+                leaf: tree.getNode(gIndex).root,
+                singleProof: tree.getSingleProof(gIndex),
+                gindex: gIndex,
                 value: item,
             };
         },

@@ -16,6 +16,11 @@ const verify_1 = require("./verify");
 const lodestar_params_1 = require("@chainsafe/lodestar-params");
 const bytes_1 = require("../../util/bytes");
 const initState_1 = require("../../chain/initState");
+/**
+ * Timeout in ms to take a break from reading a backfillBatchSize from db, as just yielding
+ * to sync loop gives hardly any.
+ */
+const DB_READ_BREATHER_TIMEOUT = 1000;
 var BackfillSyncEvent;
 (function (BackfillSyncEvent) {
     BackfillSyncEvent["completed"] = "BackfillSync-completed";
@@ -51,7 +56,7 @@ class BackfillSync extends events_1.EventEmitter {
         this.addPeer = (peerId, peerStatus) => {
             var _a, _b;
             const requiredSlot = (_b = (_a = this.syncAnchor.lastBackSyncedBlock) === null || _a === void 0 ? void 0 : _a.slot) !== null && _b !== void 0 ? _b : this.backfillStartFromSlot;
-            this.logger.debug("BackfillSync add peer", { peerhead: peerStatus.headSlot, requiredSlot });
+            this.logger.debug("Add peer", { peerhead: peerStatus.headSlot, requiredSlot });
             if (peerStatus.headSlot >= requiredSlot) {
                 this.peers.add(peerId);
                 this.processor.trigger();
@@ -74,6 +79,7 @@ class BackfillSync extends events_1.EventEmitter {
         this.opts = opts;
         this.network.events.on(network_1.NetworkEvent.peerConnected, this.addPeer);
         this.network.events.on(network_1.NetworkEvent.peerDisconnected, this.removePeer);
+        this.signal = modules.signal;
         this.sync()
             .then((oldestSlotSynced) => {
             if (this.status !== BackfillSyncStatus.completed) {
@@ -132,15 +138,19 @@ class BackfillSync extends events_1.EventEmitter {
             anchorSlot,
             lastBackSyncedBlock: null,
         };
-        const backfillStartFromSlot = anchorState.slot;
-        modules.logger.info("BackfillSync - initializing from Checkpoint", {
-            root: (0, ssz_1.toHexString)(anchorCp.root),
-            epoch: anchorCp.epoch,
-            slot: anchorSlot,
-        });
         // Load the previous written to slot for the key  backfillStartFromSlot
         // in backfilledRanges
+        const backfillStartFromSlot = anchorSlot;
         const backfillRangeWrittenSlot = await db.backfilledRanges.get(backfillStartFromSlot);
+        const previousBackfilledRanges = await db.backfilledRanges.entries({
+            lte: backfillStartFromSlot,
+        });
+        modules.logger.info("Initializing from Checkpoint", {
+            root: (0, ssz_1.toHexString)(anchorCp.root),
+            epoch: anchorCp.epoch,
+            backfillStartFromSlot,
+            previousBackfilledRanges: JSON.stringify(previousBackfilledRanges),
+        });
         // wsCheckpointHeader is where the checkpoint can actually be validated
         const wsCheckpointHeader = wsCheckpoint
             ? { root: wsCheckpoint.root, slot: wsCheckpoint.epoch * lodestar_params_1.SLOTS_PER_EPOCH }
@@ -246,10 +256,10 @@ class BackfillSync extends events_1.EventEmitter {
                     this.syncAnchor.lastBackSyncedBlock.slot < this.backfillRangeWrittenSlot) {
                     this.backfillRangeWrittenSlot = this.syncAnchor.lastBackSyncedBlock.slot;
                     await this.db.backfilledRanges.put(this.backfillStartFromSlot, this.backfillRangeWrittenSlot);
-                    this.logger.debug(`updated the backfill range from=${this.backfillStartFromSlot} till=${this.backfillRangeWrittenSlot}`);
+                    this.logger.debug(`Updated the backfill range from=${this.backfillStartFromSlot} till=${this.backfillRangeWrittenSlot}`);
                 }
                 if (this.syncAnchor.lastBackSyncedBlock.slot === constants_1.GENESIS_SLOT) {
-                    this.logger.verbose("BackfillSync - successfully synced to genesis.");
+                    this.logger.verbose("Successfully synced to genesis.");
                     this.status = BackfillSyncStatus.completed;
                     return constants_1.GENESIS_SLOT;
                 }
@@ -276,7 +286,7 @@ class BackfillSync extends events_1.EventEmitter {
             const peer = (0, shuffle_1.shuffleOne)(this.peers.values());
             if (!peer) {
                 this.status = BackfillSyncStatus.pending;
-                this.logger.debug("BackfillSync no peers yet");
+                this.logger.debug("No peers yet");
                 continue;
             }
             try {
@@ -293,7 +303,7 @@ class BackfillSync extends events_1.EventEmitter {
             }
             catch (e) {
                 (_a = this.metrics) === null || _a === void 0 ? void 0 : _a.backfillSync.errors.inc();
-                this.logger.error("BackfillSync sync error", {}, e);
+                this.logger.error("Sync error", {}, e);
                 if (e instanceof errors_1.BackfillSyncError) {
                     switch (e.type.code) {
                         case errors_1.BackfillSyncErrorCode.INTERNAL_ERROR:
@@ -349,12 +359,13 @@ class BackfillSync extends events_1.EventEmitter {
                 // from wsDbCheckpointBlock's slot to the wsCheckpoint's epoch
                 // TODO: one can verify the child of wsDbCheckpointBlock is at
                 // slot > wsCheckpointHeader
-                wsDbCheckpointBlock.message.slot > this.wsCheckpointHeader.slot)
+                // Note: next epoch is at wsCheckpointHeader.slot + SLOTS_PER_EPOCH
+                wsDbCheckpointBlock.message.slot >= this.wsCheckpointHeader.slot + lodestar_params_1.SLOTS_PER_EPOCH)
                 // TODO: explode and stop the entire node
                 throw new Error(`InvalidWsCheckpoint root=${this.wsCheckpointHeader.root}, epoch=${this.wsCheckpointHeader.slot / lodestar_params_1.SLOTS_PER_EPOCH}, ${wsDbCheckpointBlock
                     ? "found at epoch=" + Math.floor((wsDbCheckpointBlock === null || wsDbCheckpointBlock === void 0 ? void 0 : wsDbCheckpointBlock.message.slot) / lodestar_params_1.SLOTS_PER_EPOCH)
                     : "not found"}`);
-            this.logger.info("BackfillSync - wsCheckpoint validated!", {
+            this.logger.info("wsCheckpoint validated!", {
                 root: (0, ssz_1.toHexString)(this.wsCheckpointHeader.root),
                 epoch: this.wsCheckpointHeader.slot / lodestar_params_1.SLOTS_PER_EPOCH,
             });
@@ -384,7 +395,7 @@ class BackfillSync extends events_1.EventEmitter {
                 }
                 if (anchorBlock && validSequence) {
                     if (this.prevFinalizedCheckpointBlock.slot >= jumpBackTo) {
-                        this.logger.debug(`found a sequence going back to ${jumpBackTo} before the previous finalized or wsCheckpoint`, { slot: this.prevFinalizedCheckpointBlock.slot });
+                        this.logger.debug(`Found a sequence going back to ${jumpBackTo} before the previous finalized or wsCheckpoint`, { slot: this.prevFinalizedCheckpointBlock.slot });
                         // Everything saved in db between a backfilled range is a connected sequence
                         // we only need to check if prevFinalizedCheckpointBlock is in db
                         const prevBackfillCpBlock = await this.db.blockArchive.getByRoot(this.prevFinalizedCheckpointBlock.root);
@@ -405,9 +416,7 @@ class BackfillSync extends events_1.EventEmitter {
                     // Update the current sequence in DB as we will be cleaning up previous sequences
                     await this.db.backfilledRanges.put(this.backfillStartFromSlot, jumpBackTo);
                     this.backfillRangeWrittenSlot = jumpBackTo;
-                    this.logger.verbose("backfillSync - found previous backfilled sequence in db, jumping back to", {
-                        slot: jumpBackTo,
-                    });
+                    this.logger.verbose(`Jumped and updated the backfilled range ${this.backfillStartFromSlot}, ${this.backfillRangeWrittenSlot}`, { jumpBackTo });
                     const anchorBlockHeader = (0, lodestar_beacon_state_transition_1.blockToHeader)(this.config, anchorBlock.message);
                     const anchorBlockRoot = lodestar_types_1.ssz.phase0.BeaconBlockHeader.hashTreeRoot(anchorBlockHeader);
                     this.syncAnchor = {
@@ -426,11 +435,12 @@ class BackfillSync extends events_1.EventEmitter {
                 }
             }
         }
-        if (filteredSeqs.length > 0) {
-            await this.db.backfilledRanges.batchDelete(
-            // Only delete < backfillStartFromSlot, the keys greater than this would be cleaned
-            // up by the archival process of forward sync
-            filteredSeqs.filter((entry) => entry.key < this.backfillStartFromSlot).map((entry) => entry.key));
+        // Only delete < backfillStartFromSlot, the keys greater than this would be cleaned
+        // up by the archival process of forward sync
+        const cleanupSeqs = filteredSeqs.filter((entry) => entry.key < this.backfillStartFromSlot);
+        if (cleanupSeqs.length > 0) {
+            await this.db.backfilledRanges.batchDelete(cleanupSeqs.map((entry) => entry.key));
+            this.logger.debug(`Cleaned up the old sequences between ${this.backfillStartFromSlot},${this.syncAnchor.lastBackSyncedBlock}`, { cleanupSeqs: JSON.stringify(cleanupSeqs) });
         }
         return validSequence;
     }
@@ -491,9 +501,14 @@ class BackfillSync extends events_1.EventEmitter {
             lastBackSyncedBlock: { root: anchorBlockRoot, slot: anchorBlock.message.slot, block: anchorBlock },
         };
         (_a = this.metrics) === null || _a === void 0 ? void 0 : _a.backfillSync.totalBlocks.inc({ method: BackfillSyncMethod.database }, backCount);
-        this.logger.verbose(`BackfillSync - read ${backCount} blocks from DB till `, {
+        this.logger.verbose(`Read ${backCount} blocks from DB till `, {
             slot: anchorBlock.message.slot,
         });
+        if (backCount >= this.opts.backfillBatchSize) {
+            // We should sleep as there seems to be more that can be read from db but yielding to
+            // the sync loop hardly gives any breather to the beacon node
+            await (0, lodestar_utils_1.sleep)(DB_READ_BREATHER_TIMEOUT, this.signal);
+        }
         return true;
     }
     async syncBlockByRoot(peer, anchorBlockRoot) {
@@ -517,7 +532,7 @@ class BackfillSync extends events_1.EventEmitter {
             lastBackSyncedBlock: { root: anchorBlockRoot, slot: anchorBlock.message.slot, block: anchorBlock },
         };
         (_a = this.metrics) === null || _a === void 0 ? void 0 : _a.backfillSync.totalBlocks.inc({ method: BackfillSyncMethod.blockbyroot });
-        this.logger.verbose("BackfillSync - fetched new anchorBlock", {
+        this.logger.verbose("Fetched new anchorBlock", {
             root: (0, ssz_1.toHexString)(anchorBlockRoot),
             slot: anchorBlock.message.slot,
         });
@@ -572,7 +587,7 @@ class BackfillSync extends events_1.EventEmitter {
                 anchorSlot: nextAnchor.slot,
                 lastBackSyncedBlock: nextAnchor,
             };
-            this.logger.verbose(`BackfillSync - syncRange discovered ${verifiedBlocks.length} valid blocks`, {
+            this.logger.verbose(`syncRange discovered ${verifiedBlocks.length} valid blocks`, {
                 backfilled: this.syncAnchor.lastBackSyncedBlock.slot,
             });
         }

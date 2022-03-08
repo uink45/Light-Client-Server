@@ -113,8 +113,7 @@ const MAX_PREV_HEAD_DATA = 32;
  * Storing 4 witness per epoch costs `6848 * 4 * 32 = 876544 ~ 0.9 MB/m`.
  */
 class LightClientServer {
-    constructor(modules, genesisData) {
-        this.genesisData = genesisData;
+    constructor(modules) {
         this.knownSyncCommittee = new map_1.MapDef(() => new Set());
         this.storedCurrentSyncCommittee = false;
         /**
@@ -123,10 +122,12 @@ class LightClientServer {
         this.prevHeadData = new Map();
         this.checkpointHeaders = new Map();
         this.latestHeadUpdate = null;
-        this.config = modules.config;
-        this.db = modules.db;
-        this.emitter = modules.emitter;
-        this.logger = modules.logger;
+        const { config, db, metrics, emitter, logger } = modules;
+        this.config = config;
+        this.db = db;
+        this.metrics = metrics;
+        this.emitter = emitter;
+        this.logger = logger;
         this.zero = {
             finalizedHeader: lodestar_types_1.ssz.phase0.BeaconBlockHeader.defaultValue(),
             finalityBranch: lodestar_types_1.ssz.altair.LightClientUpdate.getPropertyType("finalityBranch").defaultValue(),
@@ -364,6 +365,7 @@ class LightClientServer {
      * that sync period.
      */
     async maybeStoreNewBestPartialUpdate(syncAggregate, attestedData) {
+        var _a;
         const period = (0, lodestar_beacon_state_transition_1.computeSyncPeriodAtSlot)(attestedData.attestedHeader.slot);
         const prevBestUpdate = await this.db.bestPartialLightClientUpdate.get(period);
         if (prevBestUpdate && !isBetterUpdate(prevBestUpdate, syncAggregate, attestedData)) {
@@ -394,6 +396,11 @@ class LightClientServer {
             isFinalized: attestedData.isFinalized,
             participation: sumBits(syncAggregate.syncCommitteeBits) / lodestar_params_1.SYNC_COMMITTEE_SIZE,
         });
+        // Count total persisted updates per type. DB metrics don't diff between each type.
+        // The frequency of finalized vs non-finalized is critical to debug if finalizedHeader is not available
+        (_a = this.metrics) === null || _a === void 0 ? void 0 : _a.lightclientServer.persistedUpdates.inc({
+            type: newPartialUpdate.isFinalized ? "finalized" : "non-finalized",
+        });
     }
     async storeSyncCommittee(syncCommittee, syncCommitteeRoot) {
         const isKnown = await this.db.syncCommittee.has(syncCommitteeRoot);
@@ -412,6 +419,10 @@ class LightClientServer {
         }
         const finalizedHeader = await this.db.checkpointHeader.get(finalizedBlockRoot);
         if (!finalizedHeader) {
+            // finalityHeader is not available during sync, since started after the finalized checkpoint.
+            // See https://github.com/ChainSafe/lodestar/issues/3495
+            // To prevent excesive logging this condition is not considered an error, but the lightclient updater
+            // will just create a non-finalized update.
             this.logger.debug("finalizedHeader not available", { root: finalizedBlockRootHex });
             return null;
         }

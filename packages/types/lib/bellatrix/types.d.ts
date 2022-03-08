@@ -7,7 +7,7 @@ declare type ExecutionPayloadFields = {
     stateRoot: Bytes32;
     receiptsRoot: Bytes32;
     logsBloom: Uint8Array;
-    random: Bytes32;
+    prevRandao: Bytes32;
     blockNumber: number;
     gasLimit: Number64;
     gasUsed: Number64;

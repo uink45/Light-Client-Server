@@ -4,7 +4,8 @@ exports.options = exports.parseArgs = void 0;
 const lodestar_1 = require("@chainsafe/lodestar");
 function parseArgs(args) {
     return {
-        useSingleThreadVerifier: args["chain.useSingleThreadVerifier"],
+        blsVerifyAllMultiThread: args["chain.blsVerifyAllMultiThread"],
+        blsVerifyAllMainThread: args["chain.blsVerifyAllMainThread"],
         disableBlsBatchVerify: args["chain.disableBlsBatchVerify"],
         persistInvalidSszObjects: args["chain.persistInvalidSszObjects"],
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
@@ -15,11 +16,18 @@ function parseArgs(args) {
 }
 exports.parseArgs = parseArgs;
 exports.options = {
-    "chain.useSingleThreadVerifier": {
+    "chain.blsVerifyAllMultiThread": {
         hidden: true,
         type: "boolean",
-        description: "Disable spawning worker threads for BLS verification, use single thread implementation.",
-        defaultDescription: String(lodestar_1.defaultOptions.chain.useSingleThreadVerifier),
+        description: "Always use worker threads for BLS verification",
+        defaultDescription: String(lodestar_1.defaultOptions.chain.blsVerifyAllMultiThread),
+        group: "chain",
+    },
+    "chain.blsVerifyAllMainThread": {
+        hidden: true,
+        type: "boolean",
+        description: "Always use main threads for BLS verification",
+        defaultDescription: String(lodestar_1.defaultOptions.chain.blsVerifyAllMainThread),
         group: "chain",
     },
     "chain.disableBlsBatchVerify": {
@@ -27,7 +35,7 @@ exports.options = {
         type: "boolean",
         description: "Do not use BLS batch verify to validate all block signatures at once. \
 Will double processing times. Use only for debugging purposes.",
-        defaultDescription: String(lodestar_1.defaultOptions.chain.disableBlsBatchVerify),
+        defaultDescription: String(lodestar_1.defaultOptions.chain.blsVerifyAllMultiThread),
         group: "chain",
     },
     "chain.persistInvalidSszObjects": {

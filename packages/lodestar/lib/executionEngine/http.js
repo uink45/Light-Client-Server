@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.parseExecutionPayload = exports.serializeExecutionPayload = exports.ExecutionEngineHttp = exports.defaultExecutionEngineHttpOpts = void 0;
 const lodestar_params_1 = require("@chainsafe/lodestar-params");
+const lodestar_utils_1 = require("@chainsafe/lodestar-utils");
 const jsonRpcHttpClient_1 = require("../eth1/provider/jsonRpcHttpClient");
 const utils_1 = require("../eth1/provider/utils");
 const interface_1 = require("./interface");
@@ -24,6 +25,7 @@ class ExecutionEngineHttp {
             rpc !== null && rpc !== void 0 ? rpc : new jsonRpcHttpClient_1.JsonRpcHttpClient(opts.urls, {
                 signal,
                 timeout: opts.timeout,
+                jwtSecret: opts.jwtSecretHex ? (0, lodestar_utils_1.fromHex)(opts.jwtSecretHex) : undefined,
             });
     }
     /**
@@ -149,7 +151,7 @@ class ExecutionEngineHttp {
         const apiPayloadAttributes = payloadAttributes
             ? {
                 timestamp: (0, utils_1.numToQuantity)(payloadAttributes.timestamp),
-                random: (0, utils_1.bytesToData)(payloadAttributes.random),
+                prevRandao: (0, utils_1.bytesToData)(payloadAttributes.prevRandao),
                 suggestedFeeRecipient: (0, utils_1.bytesToData)(payloadAttributes.suggestedFeeRecipient),
             }
             : undefined;
@@ -209,7 +211,7 @@ function serializeExecutionPayload(data) {
         stateRoot: (0, utils_1.bytesToData)(data.stateRoot),
         receiptsRoot: (0, utils_1.bytesToData)(data.receiptsRoot),
         logsBloom: (0, utils_1.bytesToData)(data.logsBloom),
-        random: (0, utils_1.bytesToData)(data.random),
+        prevRandao: (0, utils_1.bytesToData)(data.prevRandao),
         blockNumber: (0, utils_1.numToQuantity)(data.blockNumber),
         gasLimit: (0, utils_1.numToQuantity)(data.gasLimit),
         gasUsed: (0, utils_1.numToQuantity)(data.gasUsed),
@@ -228,7 +230,7 @@ function parseExecutionPayload(data) {
         stateRoot: (0, utils_1.dataToBytes)(data.stateRoot, 32),
         receiptsRoot: (0, utils_1.dataToBytes)(data.receiptsRoot, 32),
         logsBloom: (0, utils_1.dataToBytes)(data.logsBloom, lodestar_params_1.BYTES_PER_LOGS_BLOOM),
-        random: (0, utils_1.dataToBytes)(data.random, 32),
+        prevRandao: (0, utils_1.dataToBytes)(data.prevRandao, 32),
         blockNumber: (0, utils_1.quantityToNum)(data.blockNumber),
         gasLimit: (0, utils_1.quantityToNum)(data.gasLimit),
         gasUsed: (0, utils_1.quantityToNum)(data.gasUsed),

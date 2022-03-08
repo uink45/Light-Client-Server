@@ -5,8 +5,6 @@ import {linspace} from "../../../util/numpy";
 import {fromHexString, isCompositeType} from "@chainsafe/ssz";
 import {ProofType} from "@chainsafe/persistent-merkle-tree";
 import {IApiOptions} from "../../options";
-import { resolveBlockId } from "../beacon/blocks/utils";
-import { blockToHeader } from "@chainsafe/lodestar-beacon-state-transition";
 
 // TODO: Import from lightclient/server package
 
@@ -21,19 +19,15 @@ export function getLightclientApi(
   return {
     async getStateProof(stateId, paths) {
       const state = await resolveStateId(config, chain, db, stateId);
-     
-     
       // eslint-disable-next-line @typescript-eslint/naming-convention
       const BeaconState = config.getForkTypes(state.slot).BeaconState;
       const stateTreeBacked = BeaconState.createTreeBackedFromStruct(state);
       const tree = stateTreeBacked.tree;
-      
 
       const gindicesSet = new Set<bigint>();
 
       for (const path of paths) {
         // Logic from TreeBacked#createProof is (mostly) copied here to expose the # of gindices in the proof
-        
         const {type, gindex} = BeaconState.getPathInfo(path);
         if (!isCompositeType(type)) {
           gindicesSet.add(gindex);
@@ -52,7 +46,7 @@ export function getLightclientApi(
       if (gindicesSet.size > maxGindicesInProof) {
         throw new Error("Requested proof is too large.");
       }
-      
+
       return {
         data: tree.getProof({
           type: ProofType.treeOffset,
@@ -69,16 +63,6 @@ export function getLightclientApi(
 
     async getHeadUpdate() {
       return {data: await chain.lightClientServer.getHeadUpdate()};
-    },
-
-    async getHeadUpdateBySlot(slot){
-      const header = await resolveBlockId(chain.forkChoice, db, slot);
-      const syncCommittee = await resolveBlockId(chain.forkChoice, db, slot+1);
-      const lightClientHeader = {
-        syncAggregate: syncCommittee.message.body.syncAggregate,
-        attestedHeader: blockToHeader(config, header.message)
-      };
-      return {data: lightClientHeader};
     },
 
     async getSnapshot(blockRoot) {

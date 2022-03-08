@@ -17,7 +17,7 @@ export declare const Transactions: ListType<List<Uint8Array>>;
  *     state_root: Bytes32
  *     receipt_root: Bytes32  # 'receipts root' in the yellow paper
  *     logs_bloom: ByteVector[BYTES_PER_LOGS_BLOOM]
- *     random: Bytes32  # 'difficulty' in the yellow paper
+ *     prevRandao: Bytes32  # 'difficulty' in the yellow paper
  *     block_number: uint64  # 'number' in the yellow paper
  *     gas_limit: uint64
  *     gas_used: uint64

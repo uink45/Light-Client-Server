@@ -20,6 +20,7 @@ const map_1 = require("../../util/map");
 const it_pipe_1 = __importDefault(require("it-pipe"));
 const utils_1 = require("libp2p-interfaces/src/pubsub/utils");
 const scoringParameters_1 = require("./scoringParameters");
+const scoreMetrics_1 = require("./scoreMetrics");
 /**
  * Wrapper around js-libp2p-gossipsub with the following extensions:
  * - Eth2 message id
@@ -337,7 +338,6 @@ class Eth2Gossipsub extends libp2p_gossipsub_1.default {
         let peerCountScoreGossip = 0;
         let peerCountScoreMesh = 0;
         const { graylistThreshold, publishThreshold, gossipThreshold } = scoringParameters_1.gossipScoreThresholds;
-        const { scoreByThreshold, score: scoreMetric } = metrics.gossipPeer;
         const gossipScores = [];
         for (const peerIdStr of this.peers.keys()) {
             const score = this.score.score(peerIdStr);
@@ -351,11 +351,26 @@ class Eth2Gossipsub extends libp2p_gossipsub_1.default {
                 peerCountScoreMesh++;
             gossipScores.push(score);
         }
+        // Access once for all calls below
+        const { scoreByThreshold, scoreWeights } = metrics.gossipPeer;
         scoreByThreshold.set({ threshold: "graylist" }, peerCountScoreGraylist);
         scoreByThreshold.set({ threshold: "publish" }, peerCountScorePublish);
         scoreByThreshold.set({ threshold: "gossip" }, peerCountScoreGossip);
         scoreByThreshold.set({ threshold: "mesh" }, peerCountScoreMesh);
-        scoreMetric.set(gossipScores);
+        // Breakdown on each score weight
+        const sw = (0, scoreMetrics_1.computeAllPeersScoreWeights)(this.peers.keys(), this.score.peerStats, this.score.params, this.score.peerIPs, this.gossipTopicCache);
+        for (const [topic, wsTopic] of sw.byTopic) {
+            scoreWeights.set({ topic, p: "p1" }, wsTopic.p1w);
+            scoreWeights.set({ topic, p: "p2" }, wsTopic.p2w);
+            scoreWeights.set({ topic, p: "p3" }, wsTopic.p3w);
+            scoreWeights.set({ topic, p: "p3b" }, wsTopic.p3bw);
+            scoreWeights.set({ topic, p: "p4" }, wsTopic.p4w);
+        }
+        scoreWeights.set({ p: "p5" }, sw.p5w);
+        scoreWeights.set({ p: "p6" }, sw.p6w);
+        scoreWeights.set({ p: "p7" }, sw.p7w);
+        // Register full score too
+        metrics.gossipPeer.score.set(sw.score);
     }
 }
 exports.Eth2Gossipsub = Eth2Gossipsub;

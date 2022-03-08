@@ -9,6 +9,7 @@ export declare enum PeerSyncType {
     /** A peer is behind in the sync and not useful to us for downloading blocks */
     Behind = "Behind"
 }
+export declare const peerSyncTypes: PeerSyncType[];
 export declare function getPeerSyncType(local: phase0.Status, remote: phase0.Status, forkChoice: IForkChoice, slotImportTolerance: number): PeerSyncType;
 export declare enum RangeSyncType {
     /** A finalized chain sync should be started with this peer */
@@ -16,6 +17,7 @@ export declare enum RangeSyncType {
     /** A head chain sync should be started with this peer */
     Head = "Head"
 }
+export declare const rangeSyncTypes: RangeSyncType[];
 /**
  * Check if a peer requires a finalized chain sync. Only if:
  * - The remotes finalized epoch is greater than our current finalized epoch and we have

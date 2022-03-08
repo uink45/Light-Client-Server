@@ -5,6 +5,7 @@ import { ILogger } from "@chainsafe/lodestar-utils";
 import { routes } from "@chainsafe/lodestar-api";
 import { BitVector } from "@chainsafe/ssz";
 import { IBeaconDb } from "../../db";
+import { IMetrics } from "../../metrics";
 import { ChainEventEmitter } from "../emitter";
 import { PartialLightClientUpdate } from "./types";
 declare type SyncAttestedData = {
@@ -18,16 +19,13 @@ declare type SyncAttestedData = {
 } | {
     isFinalized: false;
 });
-declare type GenesisData = {
-    genesisTime: number;
-    genesisValidatorsRoot: Uint8Array;
-};
-interface ILightClientIniterModules {
+declare type LightClientServerModules = {
     config: IChainForkConfig;
     db: IBeaconDb;
+    metrics: IMetrics | null;
     emitter: ChainEventEmitter;
     logger: ILogger;
-}
+};
 /**
  * Compute and cache "init" proofs as the chain advances.
  * Will compute proofs for:
@@ -129,9 +127,9 @@ interface ILightClientIniterModules {
  * Storing 4 witness per epoch costs `6848 * 4 * 32 = 876544 ~ 0.9 MB/m`.
  */
 export declare class LightClientServer {
-    private readonly genesisData;
     private readonly db;
     private readonly config;
+    private readonly metrics;
     private readonly emitter;
     private readonly logger;
     private readonly knownSyncCommittee;
@@ -143,7 +141,7 @@ export declare class LightClientServer {
     private checkpointHeaders;
     private latestHeadUpdate;
     private readonly zero;
-    constructor(modules: ILightClientIniterModules, genesisData: GenesisData);
+    constructor(modules: LightClientServerModules);
     /**
      * Call after importing a block, having the postState available in memory for proof generation.
      * - Persist state witness

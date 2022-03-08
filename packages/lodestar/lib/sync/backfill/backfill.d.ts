@@ -5,6 +5,7 @@ import { StrictEventEmitter } from "strict-event-emitter-types";
 import { IBeaconConfig } from "@chainsafe/lodestar-config";
 import { phase0, Root, Slot, allForks } from "@chainsafe/lodestar-types";
 import { ILogger } from "@chainsafe/lodestar-utils";
+import { AbortSignal } from "@chainsafe/abort-controller";
 import { IBeaconChain } from "../../chain";
 import { IBeaconDb } from "../../db";
 import { INetwork } from "../../network";
@@ -19,6 +20,7 @@ export declare type BackfillSyncModules = {
     metrics: IMetrics | null;
     anchorState: TreeBacked<allForks.BeaconState>;
     wsCheckpoint?: phase0.Checkpoint;
+    signal: AbortSignal;
 };
 declare type BackfillModules = BackfillSyncModules & {
     syncAnchor: BackFillSyncAnchor;
@@ -122,6 +124,7 @@ export declare class BackfillSync extends BackfillSync_base {
     private processor;
     private peers;
     private status;
+    private signal;
     constructor(opts: BackfillSyncOpts, modules: BackfillModules);
     /**
      * Use the root of the anchorState of the beacon node as the starting point of the

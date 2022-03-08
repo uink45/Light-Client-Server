@@ -54,9 +54,10 @@ class BeaconChain {
         this.executionEngine = executionEngine;
         const signal = this.abortController.signal;
         const emitter = new emitter_1.ChainEventEmitter();
-        const bls = opts.useSingleThreadVerifier
-            ? new bls_1.BlsSingleThreadVerifier()
-            : new bls_1.BlsMultiThreadWorkerPool({ logger, metrics, signal: this.abortController.signal });
+        // by default, verify signatures on both main threads and worker threads
+        const bls = opts.blsVerifyAllMainThread
+            ? new bls_1.BlsSingleThreadVerifier({ metrics })
+            : new bls_1.BlsMultiThreadWorkerPool(opts, { logger, metrics, signal: this.abortController.signal });
         const clock = new clock_1.LocalClock({ config, emitter, genesisTime: this.genesisTime, signal });
         const stateCache = new stateCache_1.StateContextCache({ metrics });
         const checkpointStateCache = new stateCache_1.CheckpointStateCache({ metrics });
@@ -72,7 +73,7 @@ class BeaconChain {
             emitter,
             signal,
         });
-        const lightClientServer = new lightClient_1.LightClientServer({ config, db, emitter, logger }, { genesisTime: this.genesisTime, genesisValidatorsRoot: this.genesisValidatorsRoot });
+        const lightClientServer = new lightClient_1.LightClientServer({ config, db, metrics, emitter, logger });
         this.reprocessController = new reprocess_1.ReprocessController(this.metrics);
         this.blockProcessor = new blocks_1.BlockProcessor({
             clock,

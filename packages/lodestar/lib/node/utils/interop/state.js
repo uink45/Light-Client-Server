@@ -11,7 +11,7 @@ function getInteropState(config, { genesisTime = Math.floor(Date.now() / 1000), 
     // TODO: when having different test options, consider modifying these values
     latestPayloadHeader.blockHash = eth1BlockHash;
     latestPayloadHeader.timestamp = eth1Timestamp;
-    latestPayloadHeader.random = eth1BlockHash;
+    latestPayloadHeader.prevRandao = eth1BlockHash;
     latestPayloadHeader.gasLimit = lodestar_params_1.GENESIS_GAS_LIMIT;
     latestPayloadHeader.baseFeePerGas = lodestar_params_1.GENESIS_BASE_FEE_PER_GAS;
     const state = (0, lodestar_beacon_state_transition_1.initializeBeaconStateFromEth1)(config, eth1BlockHash, eth1Timestamp, deposits, fullDepositDataRootList, latestPayloadHeader);

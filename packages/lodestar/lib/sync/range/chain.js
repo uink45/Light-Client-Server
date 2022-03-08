@@ -31,10 +31,8 @@ var SyncChainStatus;
  * root are grouped into the peer pool and queried for batches when downloading the chain.
  */
 class SyncChain {
-    constructor(startEpoch, syncType, fns, modules, opts) {
+    constructor(startEpoch, initialTarget, syncType, fns, modules, opts) {
         var _a;
-        /** Should sync up until this slot, then stop */
-        this.target = null;
         /** Number of validated epochs. For the SyncRange to prevent switching chains too fast */
         this.validatedEpochs = 0;
         this.status = SyncChainStatus.Stopped;
@@ -44,6 +42,7 @@ class SyncChain {
         this.batches = new Map();
         this.peerset = new peerMap_1.PeerMap();
         this.startEpoch = startEpoch;
+        this.target = initialTarget;
         this.syncType = syncType;
         this.processChainSegment = fns.processChainSegment;
         this.downloadBeaconBlocksByRange = fns.downloadBeaconBlocksByRange;
@@ -53,7 +52,7 @@ class SyncChain {
         this.opts = { epochsPerBatch: (_a = opts === null || opts === void 0 ? void 0 : opts.epochsPerBatch) !== null && _a !== void 0 ? _a : constants_1.EPOCHS_PER_BATCH };
         this.logId = `${syncType}`;
         // Trigger event on parent class
-        this.sync().then(() => fns.onEnd(), (e) => fns.onEnd(e));
+        this.sync().then(() => fns.onEnd(null, this.target), (e) => fns.onEnd(e, null));
     }
     /**
      * Start syncing a new chain or an old one with an existing peer list
@@ -131,8 +130,8 @@ class SyncChain {
     /** Full debug state for lodestar API */
     getDebugState() {
         return {
-            targetRoot: this.target && (0, ssz_1.toHexString)(this.target.root),
-            targetSlot: this.target && this.target.slot,
+            targetRoot: (0, ssz_1.toHexString)(this.target.root),
+            targetSlot: this.target.slot,
             syncType: this.syncType,
             status: this.status,
             startEpoch: this.startEpoch,
@@ -141,8 +140,10 @@ class SyncChain {
         };
     }
     computeTarget() {
-        const targets = this.peerset.values();
-        this.target = (0, utils_1.computeMostCommonTarget)(targets);
+        if (this.peerset.size > 0) {
+            const targets = this.peerset.values();
+            this.target = (0, utils_1.computeMostCommonTarget)(targets);
+        }
     }
     /**
      * Main Promise that handles the sync process. Will resolve when initial sync completes
@@ -159,7 +160,7 @@ class SyncChain {
                 (0, utils_1.validateBatchesStatus)((0, utils_1.toArr)(this.batches));
                 // If startEpoch of the next batch to be processed > targetEpoch -> Done
                 const toBeProcessedEpoch = (0, utils_1.toBeProcessedStartEpoch)((0, utils_1.toArr)(this.batches), this.startEpoch, this.opts);
-                if (this.target && (0, lodestar_beacon_state_transition_1.computeStartSlotAtEpoch)(toBeProcessedEpoch) >= this.target.slot) {
+                if ((0, lodestar_beacon_state_transition_1.computeStartSlotAtEpoch)(toBeProcessedEpoch) >= this.target.slot) {
                     break;
                 }
                 // Processes the next batch if ready
@@ -254,7 +255,7 @@ class SyncChain {
         const startEpoch = (0, utils_1.toBeDownloadedStartEpoch)(batches, this.startEpoch, this.opts);
         const toBeDownloadedSlot = (0, lodestar_beacon_state_transition_1.computeStartSlotAtEpoch)(startEpoch) + constants_1.BATCH_SLOT_OFFSET;
         // Don't request batches beyond the target head slot
-        if (this.target && toBeDownloadedSlot > this.target.slot) {
+        if (toBeDownloadedSlot > this.target.slot) {
             return null;
         }
         if (this.batches.has(startEpoch)) {
@@ -297,7 +298,7 @@ class SyncChain {
     async processBatch(batch) {
         const blocks = batch.startProcessing();
         // wrapError ensures to never call both batch success() and batch error()
-        const res = await (0, wrapError_1.wrapError)(this.processChainSegment(blocks));
+        const res = await (0, wrapError_1.wrapError)(this.processChainSegment(blocks, this.syncType));
         if (!res.err) {
             batch.processingSuccess();
             // If the processed batch is not empty, validate previous AwaitingValidation blocks.
