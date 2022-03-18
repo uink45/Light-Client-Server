@@ -7,7 +7,12 @@ const jsonRpcHttpClient_1 = require("../eth1/provider/jsonRpcHttpClient");
 const utils_1 = require("../eth1/provider/utils");
 const interface_1 = require("./interface");
 exports.defaultExecutionEngineHttpOpts = {
-    urls: ["http://localhost:8550"],
+    /**
+     * By default ELs host engine api on an auth protected 8551 port, would need a jwt secret to be
+     * specified to bundle jwt tokens if that is the case. In case one has access to an open
+     * port/url, one can override this and skip providing a jwt secret.
+     */
+    urls: ["http://localhost:8551"],
     timeout: 12000,
 };
 /**

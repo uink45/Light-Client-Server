@@ -1,5 +1,4 @@
 import PeerId from "peer-id";
-import { IPeerMetadataStore } from "./metastore";
 export declare enum PeerAction {
     /** Immediately ban peer */
     Fatal = "Fatal",
@@ -31,7 +30,7 @@ export interface IPeerRpcScoreStore {
     getScore(peer: PeerId): number;
     getScoreState(peer: PeerId): ScoreState;
     applyAction(peer: PeerId, action: PeerAction, actionName?: string): void;
-    update(peer: PeerId): void;
+    update(): void;
 }
 /**
  * A peer's score (perceived potential usefulness).
@@ -39,12 +38,12 @@ export interface IPeerRpcScoreStore {
  * The decay rate applies equally to positive and negative scores.
  */
 export declare class PeerRpcScoreStore implements IPeerRpcScoreStore {
-    private readonly store;
-    constructor(store: IPeerMetadataStore);
+    private readonly scores;
+    private readonly lastUpdate;
     getScore(peer: PeerId): number;
     getScoreState(peer: PeerId): ScoreState;
     applyAction(peer: PeerId, action: PeerAction, actionName?: string): void;
-    update(peer: PeerId): void;
+    update(): void;
     private decayScore;
     private add;
 }

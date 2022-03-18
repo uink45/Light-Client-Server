@@ -7,7 +7,7 @@ const list_1 = require("./list");
 const recover_1 = require("./recover");
 exports.wallet = {
     command: "wallet <command>",
-    describe: "Provides commands for managing Eth2 wallets.",
+    describe: "Provides commands for managing Ethereum Consensus wallets.",
     options: options_1.accountWalletsOptions,
     subcommands: [create_1.create, list_1.list, recover_1.recover],
 };

@@ -69,7 +69,7 @@ class SyncContributionAndProofPool {
         if (!bestContributionBySubnet || bestContributionBySubnet.size === 0) {
             // TODO: Add metric for missing SyncAggregate
             // Must return signature as G2_POINT_AT_INFINITY when participating bits are empty
-            // https://github.com/ethereum/eth2.0-specs/blob/30f2a076377264677e27324a8c3c78c590ae5e20/specs/altair/bls.md#eth2_fast_aggregate_verify
+            // https://github.com/ethereum/consensus-specs/blob/30f2a076377264677e27324a8c3c78c590ae5e20/specs/altair/bls.md#eth2_fast_aggregate_verify
             return {
                 syncCommitteeBits: lodestar_types_1.ssz.altair.SyncCommitteeBits.defaultValue(),
                 syncCommitteeSignature: lodestar_beacon_state_transition_1.G2_POINT_AT_INFINITY,

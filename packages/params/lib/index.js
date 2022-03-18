@@ -86,7 +86,7 @@ exports.PARTICIPATION_FLAG_WEIGHTS = [exports.TIMELY_SOURCE_WEIGHT, exports.TIME
 exports.TARGET_AGGREGATORS_PER_COMMITTEE = 16;
 exports.RANDOM_SUBNETS_PER_VALIDATOR = 1;
 exports.EPOCHS_PER_RANDOM_SUBNET_SUBSCRIPTION = 256;
-/** Rationale: https://github.com/ethereum/eth2.0-specs/blob/dev/specs/phase0/p2p-interface.md#why-are-there-attestation_subnet_count-attestation-subnets */
+/** Rationale: https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/phase0/p2p-interface.md#why-are-there-attestation_subnet_count-attestation-subnets */
 exports.ATTESTATION_SUBNET_COUNT = 64;
 // altair validator
 exports.TARGET_AGGREGATORS_PER_SYNC_SUBCOMMITTEE = 16;

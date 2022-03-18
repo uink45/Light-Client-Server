@@ -17,7 +17,7 @@ export declare enum Version {
 }
 /**
  * Available request/response encoding strategies:
- * https://github.com/ethereum/eth2.0-specs/blob/dev/specs/phase0/p2p-interface.md#encoding-strategies
+ * https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/phase0/p2p-interface.md#encoding-strategies
  */
 export declare enum Encoding {
     SSZ_SNAPPY = "ssz_snappy"

@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Libp2pEvent = exports.GOODBYE_KNOWN_CODES = exports.GoodByeReasonCode = exports.timeoutOptions = exports.DIAL_TIMEOUT = exports.REQUEST_TIMEOUT = exports.RESP_TIMEOUT = exports.TTFB_TIMEOUT = exports.MAX_CHUNK_SIZE = exports.GOSSIP_MAX_SIZE = exports.RespStatus = exports.ATTESTATION_PROPAGATION_SLOT_RANGE = void 0;
 /**
  * For more info on some of these constants:
- * https://github.com/ethereum/eth2.0-specs/blob/dev/specs/phase0/p2p-interface.md#configuration
+ * https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/phase0/p2p-interface.md#configuration
  */
 // Gossip constants
 /**

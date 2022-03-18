@@ -6,9 +6,9 @@ import { IReqResp, IReqRespModules } from "./interface";
 import { RateLimiterOpts } from "./response/rateLimiter";
 export declare type IReqRespOptions = Partial<typeof timeoutOptions>;
 /**
- * Implementation of eth2 p2p Req/Resp domain.
+ * Implementation of Ethereum Consensus p2p Req/Resp domain.
  * For the spec that this code is based on, see:
- * https://github.com/ethereum/eth2.0-specs/blob/dev/specs/phase0/p2p-interface.md#the-reqresp-domain
+ * https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/phase0/p2p-interface.md#the-reqresp-domain
  */
 export declare class ReqResp implements IReqResp {
     private config;
@@ -16,7 +16,6 @@ export declare class ReqResp implements IReqResp {
     private logger;
     private reqRespHandlers;
     private metadataController;
-    private peerMetadata;
     private peerRpcScores;
     private inboundRateLimiter;
     private networkEventBus;
@@ -25,16 +24,17 @@ export declare class ReqResp implements IReqResp {
     private reqCount;
     private respCount;
     private metrics;
+    private readonly encodingPreference;
     constructor(modules: IReqRespModules, options: IReqRespOptions & RateLimiterOpts);
-    start(): void;
-    stop(): void;
+    start(): Promise<void>;
+    stop(): Promise<void>;
     status(peerId: PeerId, request: phase0.Status): Promise<phase0.Status>;
     goodbye(peerId: PeerId, request: phase0.Goodbye): Promise<void>;
     ping(peerId: PeerId): Promise<phase0.Ping>;
     metadata(peerId: PeerId, fork?: ForkName): Promise<allForks.Metadata>;
     beaconBlocksByRange(peerId: PeerId, request: phase0.BeaconBlocksByRangeRequest): Promise<allForks.SignedBeaconBlock[]>;
     beaconBlocksByRoot(peerId: PeerId, request: phase0.BeaconBlocksByRootRequest): Promise<allForks.SignedBeaconBlock[]>;
-    pruneRateLimiterData(peerId: PeerId): void;
+    pruneOnPeerDisconnect(peerId: PeerId): void;
     private sendRequest;
     private getRequestHandler;
     private onRequest;

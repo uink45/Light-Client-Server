@@ -2,13 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.validateGossipVoluntaryExit = void 0;
 const lodestar_beacon_state_transition_1 = require("@chainsafe/lodestar-beacon-state-transition");
-const network_1 = require("../../network");
 const errors_1 = require("../errors");
 async function validateGossipVoluntaryExit(chain, voluntaryExit) {
     // [IGNORE] The voluntary exit is the first valid voluntary exit received for the validator with index
     // signed_voluntary_exit.message.validator_index.
     if (chain.opPool.hasSeenVoluntaryExit(voluntaryExit.message.validatorIndex)) {
-        throw new errors_1.VoluntaryExitError(errors_1.GossipAction.IGNORE, null, {
+        throw new errors_1.VoluntaryExitError(errors_1.GossipAction.IGNORE, {
             code: errors_1.VoluntaryExitErrorCode.ALREADY_EXISTS,
         });
     }
@@ -22,16 +21,14 @@ async function validateGossipVoluntaryExit(chain, voluntaryExit) {
     const state = await chain.getHeadStateAtCurrentEpoch();
     // [REJECT] All of the conditions within process_voluntary_exit pass validation.
     // verifySignature = false, verified in batch below
-    // These errors occur due to a fault in the beacon chain. It is not necessarily
-    // the fault on the peer.
     if (!lodestar_beacon_state_transition_1.allForks.isValidVoluntaryExit(state, voluntaryExit, false)) {
-        throw new errors_1.VoluntaryExitError(errors_1.GossipAction.REJECT, network_1.PeerAction.HighToleranceError, {
+        throw new errors_1.VoluntaryExitError(errors_1.GossipAction.REJECT, {
             code: errors_1.VoluntaryExitErrorCode.INVALID,
         });
     }
     const signatureSet = lodestar_beacon_state_transition_1.allForks.getVoluntaryExitSignatureSet(state, voluntaryExit);
     if (!(await chain.bls.verifySignatureSets([signatureSet], { batchable: true }))) {
-        throw new errors_1.VoluntaryExitError(errors_1.GossipAction.REJECT, network_1.PeerAction.HighToleranceError, {
+        throw new errors_1.VoluntaryExitError(errors_1.GossipAction.REJECT, {
             code: errors_1.VoluntaryExitErrorCode.INVALID_SIGNATURE,
         });
     }

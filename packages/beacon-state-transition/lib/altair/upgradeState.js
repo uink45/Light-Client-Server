@@ -39,7 +39,7 @@ function upgradeTreeBackedState(config, state) {
     return postState;
 }
 /**
- * Translate_participation in https://github.com/ethereum/eth2.0-specs/blob/dev/specs/altair/fork.md
+ * Translate_participation in https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/altair/fork.md
  */
 function translateParticipation(state, pendingAttesations) {
     const { epochCtx } = state;

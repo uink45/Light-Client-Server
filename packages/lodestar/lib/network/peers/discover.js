@@ -288,7 +288,7 @@ class PeerDiscovery {
         const { peerId, multiaddrTCP } = cachedPeer;
         // Must add the multiaddrs array to the address book before dialing
         // https://github.com/libp2p/js-libp2p/blob/aec8e3d3bb1b245051b60c2a890550d262d5b062/src/index.js#L638
-        this.libp2p.peerStore.addressBook.add(peerId, [multiaddrTCP]);
+        await this.libp2p.peerStore.addressBook.add(peerId, [multiaddrTCP]);
         // Note: PeerDiscovery adds the multiaddrTCP beforehand
         const peerIdShort = (0, util_1.prettyPrintPeerId)(peerId);
         this.logger.debug("Dialing discovered peer", { peer: peerIdShort });

@@ -45,7 +45,7 @@ export declare const PARTICIPATION_FLAG_WEIGHTS: number[];
 export declare const TARGET_AGGREGATORS_PER_COMMITTEE = 16;
 export declare const RANDOM_SUBNETS_PER_VALIDATOR = 1;
 export declare const EPOCHS_PER_RANDOM_SUBNET_SUBSCRIPTION = 256;
-/** Rationale: https://github.com/ethereum/eth2.0-specs/blob/dev/specs/phase0/p2p-interface.md#why-are-there-attestation_subnet_count-attestation-subnets */
+/** Rationale: https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/phase0/p2p-interface.md#why-are-there-attestation_subnet_count-attestation-subnets */
 export declare const ATTESTATION_SUBNET_COUNT = 64;
 export declare const TARGET_AGGREGATORS_PER_SYNC_SUBCOMMITTEE = 16;
 export declare const SYNC_COMMITTEE_SUBNET_COUNT = 4;

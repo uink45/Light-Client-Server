@@ -5,8 +5,8 @@ const lodestar_params_1 = require("@chainsafe/lodestar-params");
 const lodestar_types_1 = require("@chainsafe/lodestar-types");
 const ssz_1 = require("@chainsafe/ssz");
 /**
- * Store vote counts for every eth1 block that has votes; if any eth1 block wins majority support within a 1024-slot
- * voting period, formally accept that eth1 block and set it as the official "latest known eth1 block" in the eth2 state.
+ * Store vote counts for every eth-execution block that has votes; if any eth-execution block wins majority support within a 1024-slot
+ * voting period, formally accept that eth-execution block and set it as the official "latest known eth-execution block" in the eth-consensus state.
  *
  * PERF: Processing cost depends on the current amount of votes.
  * - Best case: Vote is already decided, zero work. See becomesNewEth1Data conditions

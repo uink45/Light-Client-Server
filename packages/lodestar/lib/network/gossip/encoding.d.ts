@@ -1,28 +1,24 @@
-import { GossipEncoding, GossipTopic } from "./interface";
-export interface IUncompressCache {
-    uncompress(input: Uint8Array): Uint8Array;
-}
-export declare class UncompressCache implements IUncompressCache {
-    private cache;
-    uncompress(input: Uint8Array): Uint8Array;
-}
+import { Eth2InMessage, GossipEncoding, GossipTopic } from "./interface";
 /**
- * Decode message using `IUncompressCache`. Message will have been uncompressed before to compute the msgId.
- * We must re-use that result to prevent uncompressing the object again here.
+ * Uncompressed data is used to
+ * - compute message id
+ * - if message is not seen then we use it to deserialize to gossip object
+ *
+ * We cache uncompressed data in InMessage to prevent uncompressing multiple times.
  */
-export declare function decodeMessageData(encoding: GossipEncoding, msgData: Uint8Array, uncompressCache: IUncompressCache): Uint8Array;
+export declare function getUncompressedData(msg: Eth2InMessage): Uint8Array;
 export declare function encodeMessageData(encoding: GossipEncoding, msgData: Uint8Array): Uint8Array;
 /**
  * Function to compute message id for all forks.
  */
-export declare function computeMsgId(topic: GossipTopic, topicStr: string, msgData: Uint8Array, uncompressCache: IUncompressCache): Uint8Array;
+export declare function computeMsgId(topic: GossipTopic, topicStr: string, msg: Eth2InMessage): Uint8Array;
 /**
  * Function to compute message id for phase0.
  * ```
  * SHA256(MESSAGE_DOMAIN_VALID_SNAPPY + snappy_decompress(message.data))[:20]
  * ```
  */
-export declare function computeMsgIdPhase0(topic: GossipTopic, msgData: Uint8Array, uncompressCache: IUncompressCache): Uint8Array;
+export declare function computeMsgIdPhase0(topic: GossipTopic, msg: Eth2InMessage): Uint8Array;
 /**
  * Function to compute message id for altair.
  *
@@ -34,7 +30,7 @@ export declare function computeMsgIdPhase0(topic: GossipTopic, msgData: Uint8Arr
  *   snappy_decompress(message.data)
  * )[:20]
  * ```
- * https://github.com/ethereum/eth2.0-specs/blob/v1.1.0-alpha.7/specs/altair/p2p-interface.md#topics-and-messages
+ * https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/altair/p2p-interface.md#topics-and-messages
  */
-export declare function computeMsgIdAltair(topic: GossipTopic, topicStr: string, msgData: Uint8Array, uncompressCache: IUncompressCache): Uint8Array;
+export declare function computeMsgIdAltair(topic: GossipTopic, topicStr: string, msg: Eth2InMessage): Uint8Array;
 //# sourceMappingURL=encoding.d.ts.map

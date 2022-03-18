@@ -5,7 +5,7 @@ import { ForkName } from "@chainsafe/lodestar-params";
 import { IBeaconConfig } from "@chainsafe/lodestar-config";
 import { allForks, phase0 } from "@chainsafe/lodestar-types";
 import { ILogger } from "@chainsafe/lodestar-utils";
-import { IPeerMetadataStore, IPeerRpcScoreStore } from "../peers";
+import { IPeerRpcScoreStore } from "../peers";
 import { MetadataController } from "../metadata";
 import { INetworkEventBus } from "../events";
 import { ReqRespHandlers } from "./handlers";
@@ -20,7 +20,7 @@ export interface IReqResp {
     metadata(peerId: PeerId, fork?: ForkName): Promise<allForks.Metadata>;
     beaconBlocksByRange(peerId: PeerId, request: phase0.BeaconBlocksByRangeRequest): Promise<allForks.SignedBeaconBlock[]>;
     beaconBlocksByRoot(peerId: PeerId, request: phase0.BeaconBlocksByRootRequest): Promise<allForks.SignedBeaconBlock[]>;
-    pruneRateLimiterData(peerId: PeerId): void;
+    pruneOnPeerDisconnect(peerId: PeerId): void;
 }
 export interface IReqRespModules {
     config: IBeaconConfig;
@@ -28,7 +28,6 @@ export interface IReqRespModules {
     logger: ILogger;
     metadata: MetadataController;
     reqRespHandlers: ReqRespHandlers;
-    peerMetadata: IPeerMetadataStore;
     peerRpcScores: IPeerRpcScoreStore;
     networkEventBus: INetworkEventBus;
     metrics: IMetrics | null;

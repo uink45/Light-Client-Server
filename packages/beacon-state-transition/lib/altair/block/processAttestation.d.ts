@@ -3,7 +3,7 @@ import { CachedBeaconStateAltair, CachedBeaconStateAllForks, EpochContext } from
 import { CachedEpochParticipation } from "../../cache/cachedEpochParticipation";
 export declare function processAttestations(state: CachedBeaconStateAltair, attestations: phase0.Attestation[], verifySignature?: boolean): void;
 /**
- * https://github.com/ethereum/eth2.0-specs/blob/v1.1.0-alpha.4/specs/altair/beacon-chain.md#get_attestation_participation_flag_indices
+ * https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/altair/beacon-chain.md#get_attestation_participation_flag_indices
  */
 export declare function getAttestationParticipationStatus(data: phase0.AttestationData, inclusionDelay: number, rootCache: RootCache, epochCtx: EpochContext): ParticipationFlags;
 /**

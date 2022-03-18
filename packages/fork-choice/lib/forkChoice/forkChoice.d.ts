@@ -7,9 +7,9 @@ import { IForkChoiceMetrics } from "../metrics";
 import { IForkChoice, ILatestMessage, OnBlockPrecachedData } from "./interface";
 import { IForkChoiceStore, CheckpointWithHex } from "./store";
 /**
- * Provides an implementation of "Ethereum 2.0 Phase 0 -- Beacon Chain Fork Choice":
+ * Provides an implementation of "Ethereum Consensus -- Beacon Chain Fork Choice":
  *
- * https://github.com/ethereum/eth2.0-specs/blob/v0.12.2/specs/phase0/fork-choice.md#ethereum-20-phase-0----beacon-chain-fork-choice
+ * https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/phase0/fork-choice.md#fork-choice
  *
  * ## Detail
  *
@@ -92,7 +92,7 @@ export declare class ForkChoice implements IForkChoice {
      *
      * Equivalent to:
      *
-     * https://github.com/ethereum/eth2.0-specs/blob/v0.12.1/specs/phase0/fork-choice.md#get_ancestor
+     * https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/phase0/fork-choice.md#get_ancestor
      */
     getAncestor(blockRoot: RootHex, ancestorSlot: Slot): RootHex;
     /**
@@ -117,7 +117,7 @@ export declare class ForkChoice implements IForkChoice {
      *
      * Is equivalent to:
      *
-     * https://github.com/ethereum/eth2.0-specs/blob/v0.12.2/specs/phase0/fork-choice.md#get_head
+     * https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/phase0/fork-choice.md#get_head
      */
     updateHead(): IProtoBlock;
     /** Very expensive function, iterates the entire ProtoArray. Called only in debug API */
@@ -132,7 +132,7 @@ export declare class ForkChoice implements IForkChoice {
      *
      * Approximates:
      *
-     * https://github.com/ethereum/eth2.0-specs/blob/v0.12.1/specs/phase0/fork-choice.md#on_block
+     * https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/phase0/fork-choice.md#on_block
      *
      * It only approximates the specification since it does not run the `state_transition` check.
      * That should have already been called upstream and it's too expensive to call again.
@@ -152,7 +152,7 @@ export declare class ForkChoice implements IForkChoice {
      *
      * Approximates:
      *
-     * https://github.com/ethereum/eth2.0-specs/blob/v0.12.1/specs/phase0/fork-choice.md#on_attestation
+     * https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/phase0/fork-choice.md#on_attestation
      *
      * It only approximates the specification since it does not perform
      * `is_valid_indexed_attestation` since that should already have been called upstream and it's
@@ -239,7 +239,7 @@ export declare class ForkChoice implements IForkChoice {
      *
      * Is equivalent to:
      *
-     * https://github.com/ethereum/eth2.0-specs/blob/v0.12.1/specs/phase0/fork-choice.md#should_update_justified_checkpoint
+     * https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/phase0/fork-choice.md#should_update_justified_checkpoint
      */
     private shouldUpdateJustifiedCheckpoint;
     /**
@@ -249,7 +249,7 @@ export declare class ForkChoice implements IForkChoice {
      *
      * Equivalent to:
      *
-     * https://github.com/ethereum/eth2.0-specs/blob/v0.12.1/specs/phase0/fork-choice.md#validate_on_attestation
+     * https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/phase0/fork-choice.md#validate_on_attestation
      */
     private validateOnAttestation;
     private validateAttestationData;
@@ -269,7 +269,7 @@ export declare class ForkChoice implements IForkChoice {
      *
      * Equivalent to:
      *
-     * https://github.com/ethereum/eth2.0-specs/blob/v0.12.1/specs/phase0/fork-choice.md#on_tick
+     * https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/phase0/fork-choice.md#on_tick
      */
     private onTick;
 }

@@ -16,6 +16,7 @@ const handler_1 = require("../init/handler");
 const paths_1 = require("./paths");
 const initBeaconState_1 = require("./initBeaconState");
 const version_1 = require("../../util/version");
+const migrations_1 = require("../../migrations");
 /**
  * Runs a beacon node.
  */
@@ -49,6 +50,8 @@ async function beaconHandler(args) {
     logger.info("Lodestar", { version: version, network: args.network });
     if (lodestar_params_1.ACTIVE_PRESET === lodestar_params_1.PresetName.minimal)
         logger.info("ACTIVE_PRESET == minimal preset");
+    // peerstore migration
+    await (0, migrations_1.deleteOldPeerstorePreV036)(beaconPaths.peerStoreDir, logger);
     let dbMetrics = null;
     // additional metrics registries
     const metricsRegistries = [];

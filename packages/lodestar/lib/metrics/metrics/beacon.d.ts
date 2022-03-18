@@ -2,7 +2,7 @@ import { RegistryMetricCreator } from "../utils/registryMetricCreator";
 export declare type IBeaconMetrics = ReturnType<typeof createBeaconMetrics>;
 /**
  * Metrics from:
- * https://github.com/ethereum/eth2.0-metrics/ and
+ * https://github.com/ethereum/beacon-metrics/ and
  * https://hackmd.io/D5FmoeFZScim_squBFl8oA
  */
 export declare function createBeaconMetrics(register: RegistryMetricCreator): {

@@ -11,7 +11,7 @@ const options_1 = require("./options");
 const util_1 = require("./util");
 const version_1 = require("./util/version");
 const version = (0, version_1.getVersion)();
-const topBanner = `🌟 Lodestar: TypeScript Implementation of the Ethereum 2.0 Beacon Chain.
+const topBanner = `🌟 Lodestar: TypeScript Implementation of the Ethereum Consensus Beacon Chain.
   * Version: ${version}
   * by ChainSafe Systems, 2018-2022`;
 const bottomBanner = `📖 For more information, check the CLI reference:

@@ -48,7 +48,6 @@ class NodejsNode extends libp2p_1.default {
             datastore: options.datastore,
             peerStore: {
                 persistence: !!options.datastore,
-                threshold: 10,
             },
             config: {
                 nat: {

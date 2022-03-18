@@ -3,14 +3,10 @@ import { IChainForkConfig } from "@chainsafe/lodestar-config";
 import { ILogger } from "@chainsafe/lodestar-utils";
 import { IMetrics } from "../../../metrics";
 import { GossipJobQueues, ValidatorFnsByType, GossipHandlers } from "../interface";
-import { UncompressCache } from "../encoding";
-import { IPeerRpcScoreStore } from "../../peers/score";
 declare type ValidatorFnModules = {
     config: IChainForkConfig;
     logger: ILogger;
-    peerRpcScores: IPeerRpcScoreStore;
     metrics: IMetrics | null;
-    uncompressCache: UncompressCache;
 };
 /**
  * Returns GossipValidatorFn for each GossipType, given GossipHandlerFn indexed by type.

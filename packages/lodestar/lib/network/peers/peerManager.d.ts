@@ -8,7 +8,6 @@ import { IMetrics } from "../../metrics";
 import { INetworkEventBus } from "../events";
 import { IReqResp } from "../reqresp";
 import { ISubnetsService } from "../subnets";
-import { Libp2pPeerMetadataStore } from "./metastore";
 import { IPeerRpcScoreStore } from "./score";
 export declare type PeerManagerOpts = {
     /** The target number of peers we would like to connect to. */
@@ -38,7 +37,6 @@ export declare type PeerManagerModules = {
     syncnetsService: ISubnetsService;
     chain: IBeaconChain;
     config: IBeaconConfig;
-    peerMetadata: Libp2pPeerMetadataStore;
     peerRpcScores: IPeerRpcScoreStore;
     networkEventBus: INetworkEventBus;
 };
@@ -59,7 +57,6 @@ export declare class PeerManager {
     private syncnetsService;
     private chain;
     private config;
-    private peerMetadata;
     private peerRpcScores;
     /** If null, discovery is disabled */
     private discovery;

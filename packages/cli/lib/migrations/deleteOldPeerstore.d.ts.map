@@ -1,0 +1,1 @@
+{"version":3,"file":"deleteOldPeerstore.d.ts","sourceRoot":"","sources":["../../src/migrations/deleteOldPeerstore.ts"],"names":[],"mappings":"AAEA,OAAO,EAAC,OAAO,EAAC,MAAM,2BAA2B,CAAC;AAElD;;;;;GAKG;AACH,wBAAsB,yBAAyB,CAAC,YAAY,EAAE,MAAM,EAAE,MAAM,EAAE,OAAO,GAAG,OAAO,CAAC,IAAI,CAAC,CA2BpG"}

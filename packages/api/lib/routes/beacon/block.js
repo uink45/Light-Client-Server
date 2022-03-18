@@ -22,7 +22,7 @@ function getReqSerializers(config) {
         parseReq: ({ params }) => [params.blockId],
         schema: { params: { blockId: utils_1.Schema.StringRequired } },
     };
-    // Compute block type from JSON payload. See https://github.com/ethereum/eth2.0-APIs/pull/142
+    // Compute block type from JSON payload. See https://github.com/ethereum/beacon-APIs/pull/142
     const getSignedBeaconBlockType = (data) => config.getForkTypes(data.message.slot).SignedBeaconBlock;
     const AllForksSignedBeaconBlock = {
         toJson: (data, opts) => getSignedBeaconBlockType(data).toJson(data, opts),

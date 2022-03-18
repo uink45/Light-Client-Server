@@ -33,7 +33,7 @@ export declare class SyncCommitteeDutiesService {
      * Note: The range of slots a validator has to perform duties is off by one.
      * The previous slot wording means that if your validator is in a sync committee for a period that runs from slot
      * 100 to 200,then you would actually produce signatures in slot 99 - 199.
-     * https://github.com/ethereum/eth2.0-specs/pull/2400
+     * https://github.com/ethereum/consensus-specs/pull/2400
      */
     getDutiesAtSlot(slot: Slot): Promise<SyncDutyAndProofs[]>;
     private runDutiesTasks;

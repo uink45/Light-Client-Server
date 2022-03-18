@@ -33,7 +33,7 @@ var BeaconNodeStatus;
 })(BeaconNodeStatus = exports.BeaconNodeStatus || (exports.BeaconNodeStatus = {}));
 /**
  * The main Beacon Node class.  Contains various components for getting and processing data from the
- * eth2 ecosystem as well as systems for getting beacon node metadata.
+ * Ethereum Consensus ecosystem as well as systems for getting beacon node metadata.
  */
 class BeaconNode {
     constructor({ opts, config, db, metrics, metricsServer, network, chain, api, restApi, sync, backfillSync, controller, }) {
@@ -104,6 +104,9 @@ class BeaconNode {
             metrics,
         });
         const metricsServer = undefined;
+        if (metricsServer) {
+            await metricsServer.start();
+        }
         const restApi = new api_1.RestApi(opts.api.rest, {
             config,
             logger: logger.child(opts.logger.api),

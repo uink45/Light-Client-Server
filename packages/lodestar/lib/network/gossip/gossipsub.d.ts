@@ -6,16 +6,13 @@ import { IBeaconConfig } from "@chainsafe/lodestar-config";
 import { allForks, altair, phase0 } from "@chainsafe/lodestar-types";
 import { ILogger } from "@chainsafe/lodestar-utils";
 import { IMetrics } from "../../metrics";
-import { GossipJobQueues, GossipTopic, GossipTopicMap, GossipType, GossipTypeMap, GossipHandlers } from "./interface";
+import { GossipJobQueues, GossipTopic, GossipTopicMap, GossipType, GossipTypeMap, GossipHandlers, Eth2InMessage } from "./interface";
 import PeerStreams from "libp2p-interfaces/src/pubsub/peer-streams";
-import BufferList from "bl";
 import { RPC } from "libp2p-gossipsub/src/message/rpc";
 import { Eth2Context } from "../../chain";
-import { IPeerRpcScoreStore } from "../peers";
 export interface IGossipsubModules {
     config: IBeaconConfig;
     libp2p: Libp2p;
-    peerRpcScores: IPeerRpcScoreStore;
     logger: ILogger;
     metrics: IMetrics | null;
     signal: AbortSignal;
@@ -33,31 +30,40 @@ export interface IGossipsubModules {
  *   - `handleTopic`
  *   - `unhandleTopic`
  *
- * See https://github.com/ethereum/eth2.0-specs/blob/dev/specs/phase0/p2p-interface.md#the-gossip-domain-gossipsub
+ * See https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/phase0/p2p-interface.md#the-gossip-domain-gossipsub
  */
 export declare class Eth2Gossipsub extends Gossipsub {
     readonly jobQueues: GossipJobQueues;
     private readonly config;
     private readonly logger;
     private readonly gossipTopicCache;
-    private readonly uncompressCache;
-    private readonly msgIdCache;
     private readonly validatorFnsByType;
     constructor(modules: IGossipsubModules);
-    start(): void;
-    stop(): void;
+    start(): Promise<void>;
+    stop(): Promise<void>;
     /**
      * @override Use eth2 msg id and cache results to the msg
+     * The cached msgId inside the message will be ignored when we send messages to other peers
+     * since we don't have this field in protobuf.
      */
-    getMsgId(msg: InMessage): Uint8Array;
-    _processMessages(idB58Str: string, stream: AsyncIterable<Uint8Array | BufferList>, peerStreams: PeerStreams): Promise<void>;
+    getMsgId(msg: Eth2InMessage): Uint8Array;
+    /**
+     * Get cached message id string if we have it.
+     */
+    getCachedMsgIdStr(msg: Eth2InMessage): string | undefined;
     _processRpc(idB58Str: string, peerStreams: PeerStreams, rpc: RPC): Promise<boolean>;
+    /**
+     * Similar to gossipsub 0.13.0 except that no await
+     * TODO: override getMsgIdIfNotSeen and add metric
+     * See https://github.com/ChainSafe/js-libp2p-gossipsub/pull/187/files
+     */
+    _processRpcMessage(msg: InMessage): Promise<void>;
     /**
      * @override https://github.com/ChainSafe/js-libp2p-gossipsub/blob/3c3c46595f65823fcd7900ed716f43f76c6b355c/ts/index.ts#L436
      * @override https://github.com/libp2p/js-libp2p-interfaces/blob/ff3bd10704a4c166ce63135747e3736915b0be8d/src/pubsub/index.js#L513
      * Note: this does not call super. All logic is re-implemented below
      */
-    validate(message: InMessage): Promise<void>;
+    validate(message: Eth2InMessage): Promise<void>;
     /**
      * @override
      * See https://github.com/libp2p/js-libp2p-interfaces/blob/v0.5.2/src/pubsub/index.js#L428

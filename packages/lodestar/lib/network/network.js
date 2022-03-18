@@ -11,7 +11,6 @@ const reqresp_1 = require("./reqresp");
 const gossip_1 = require("./gossip");
 const metadata_1 = require("./metadata");
 const forks_1 = require("./forks");
-const metastore_1 = require("./peers/metastore");
 const peerManager_1 = require("./peers/peerManager");
 const peers_1 = require("./peers");
 const events_1 = require("./events");
@@ -113,28 +112,15 @@ class Network {
         this.chain = chain;
         const networkEventBus = new events_1.NetworkEventBus();
         const metadata = new metadata_1.MetadataController({}, { config, chain, logger });
-        const peerMetadata = new metastore_1.Libp2pPeerMetadataStore(libp2p.peerStore.metadataBook);
-        const peerRpcScores = new peers_1.PeerRpcScoreStore(peerMetadata);
+        const peerRpcScores = new peers_1.PeerRpcScoreStore();
         this.events = networkEventBus;
         this.metadata = metadata;
         this.peerRpcScores = peerRpcScores;
-        this.peerMetadata = peerMetadata;
-        this.reqResp = new reqresp_1.ReqResp({
-            config,
-            libp2p,
-            reqRespHandlers,
-            peerMetadata,
-            metadata,
-            peerRpcScores,
-            logger,
-            networkEventBus,
-            metrics,
-        }, opts);
+        this.reqResp = new reqresp_1.ReqResp({ config, libp2p, reqRespHandlers, metadata, peerRpcScores, logger, networkEventBus, metrics }, opts);
         this.gossip = new gossip_1.Eth2Gossipsub({
             config,
             libp2p,
             logger,
-            peerRpcScores,
             metrics,
             signal,
             gossipHandlers: gossipHandlers !== null && gossipHandlers !== void 0 ? gossipHandlers : (0, gossip_1.getGossipHandlers)({ chain, config, logger, network: this, metrics }, opts),
@@ -155,7 +141,6 @@ class Network {
             metrics,
             chain,
             config,
-            peerMetadata,
             peerRpcScores,
             networkEventBus,
         }, opts);
@@ -173,7 +158,7 @@ class Network {
         this.reqResp.start();
         this.metadata.start(this.getEnr(), this.config.getForkName(this.clock.currentSlot));
         await this.peerManager.start();
-        this.gossip.start();
+        await this.gossip.start();
         this.attnetsService.start();
         this.syncnetsService.start();
         const multiaddresses = this.libp2p.multiaddrs.map((m) => m.toString()).join(",");
@@ -183,11 +168,10 @@ class Network {
         // Must goodbye and disconnect before stopping libp2p
         await this.peerManager.goodbyeAndDisconnectAllPeers();
         await this.peerManager.stop();
-        this.gossip.stop();
+        await this.gossip.stop();
         this.reqResp.stop();
         this.attnetsService.stop();
         this.syncnetsService.stop();
-        this.gossip.stop();
         await this.libp2p.stop();
     }
     get discv5() {
@@ -264,7 +248,7 @@ class Network {
     }
     // Debug
     async connectToPeer(peer, multiaddr) {
-        this.libp2p.peerStore.addressBook.add(peer, multiaddr);
+        await this.libp2p.peerStore.addressBook.add(peer, multiaddr);
         await this.libp2p.dial(peer);
     }
     async disconnectPeer(peer) {

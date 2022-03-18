@@ -11,7 +11,7 @@ const voluntaryExit_1 = require("./voluntaryExit");
 const recover_1 = require("./recover");
 exports.validator = {
     command: "validator <command>",
-    describe: "Provides commands for managing Eth2 validators.",
+    describe: "Provides commands for managing Ethereum Consensus validators.",
     options: options_1.accountValidatorOptions,
     subcommands: [create_1.create, deposit_1.deposit, import_1.importCmd, list_1.list, recover_1.recover, slashingProtection_1.slashingProtection, voluntaryExit_1.voluntaryExit],
 };

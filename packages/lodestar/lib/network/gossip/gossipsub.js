@@ -6,7 +6,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Eth2Gossipsub = void 0;
 /* eslint-disable @typescript-eslint/naming-convention */
 const libp2p_gossipsub_1 = __importDefault(require("libp2p-gossipsub"));
+const messageIdToString_1 = require("libp2p-gossipsub/src/utils/messageIdToString");
+const as_sha256_1 = __importDefault(require("@chainsafe/as-sha256"));
 const constants_1 = require("libp2p-gossipsub/src/constants");
+const pubsub_1 = require("libp2p-interfaces/src/pubsub");
 const lodestar_params_1 = require("@chainsafe/lodestar-params");
 const lodestar_beacon_state_transition_1 = require("@chainsafe/lodestar-beacon-state-transition");
 const interface_1 = require("./interface");
@@ -17,7 +20,6 @@ const errors_1 = require("./errors");
 const constants_3 = require("../../constants");
 const validation_1 = require("./validation");
 const map_1 = require("../../util/map");
-const it_pipe_1 = __importDefault(require("it-pipe"));
 const utils_1 = require("libp2p-interfaces/src/pubsub/utils");
 const scoringParameters_1 = require("./scoringParameters");
 const scoreMetrics_1 = require("./scoreMetrics");
@@ -32,12 +34,12 @@ const scoreMetrics_1 = require("./scoreMetrics");
  *   - `handleTopic`
  *   - `unhandleTopic`
  *
- * See https://github.com/ethereum/eth2.0-specs/blob/dev/specs/phase0/p2p-interface.md#the-gossip-domain-gossipsub
+ * See https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/phase0/p2p-interface.md#the-gossip-domain-gossipsub
  */
 class Eth2Gossipsub extends libp2p_gossipsub_1.default {
     constructor(modules) {
         // Gossipsub parameters defined here:
-        // https://github.com/ethereum/eth2.0-specs/blob/dev/specs/phase0/p2p-interface.md#the-gossip-domain-gossipsub
+        // https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/phase0/p2p-interface.md#the-gossip-domain-gossipsub
         super(modules.libp2p, {
             gossipIncoming: true,
             globalSignaturePolicy: "StrictNoSign",
@@ -47,9 +49,8 @@ class Eth2Gossipsub extends libp2p_gossipsub_1.default {
             Dlazy: 6,
             scoreParams: (0, scoringParameters_1.computeGossipPeerScoreParams)(modules),
             scoreThresholds: scoringParameters_1.gossipScoreThresholds,
+            fastMsgIdFn: (msg) => Buffer.from(as_sha256_1.default.digest(msg.data)).toString("hex"),
         });
-        this.uncompressCache = new encoding_1.UncompressCache();
-        this.msgIdCache = new WeakMap();
         const { config, logger, metrics, signal, gossipHandlers } = modules;
         this.config = config;
         this.logger = logger;
@@ -60,8 +61,6 @@ class Eth2Gossipsub extends libp2p_gossipsub_1.default {
         const { validatorFnsByType, jobQueues } = (0, validation_1.createValidatorFnsByType)(gossipHandlers, {
             config,
             logger,
-            peerRpcScores: modules.peerRpcScores,
-            uncompressCache: this.uncompressCache,
             metrics,
             signal,
         });
@@ -71,12 +70,12 @@ class Eth2Gossipsub extends libp2p_gossipsub_1.default {
             metrics.gossipMesh.peersByType.addCollect(() => this.onScrapeMetrics(metrics));
         }
     }
-    start() {
-        super.start();
+    async start() {
+        return super.start();
     }
-    stop() {
+    async stop() {
         try {
-            super.stop();
+            await super.stop();
         }
         catch (error) {
             if (error.code !== "ERR_HEARTBEAT_NO_RUNNING") {
@@ -86,37 +85,28 @@ class Eth2Gossipsub extends libp2p_gossipsub_1.default {
     }
     /**
      * @override Use eth2 msg id and cache results to the msg
+     * The cached msgId inside the message will be ignored when we send messages to other peers
+     * since we don't have this field in protobuf.
      */
     getMsgId(msg) {
-        let msgId = this.msgIdCache.get(msg);
+        let msgId = msg.msgId;
         if (!msgId) {
             const topicStr = msg.topicIDs[0];
             const topic = this.gossipTopicCache.getTopic(topicStr);
-            msgId = (0, encoding_1.computeMsgId)(topic, topicStr, msg.data, this.uncompressCache);
-            this.msgIdCache.set(msg, msgId);
+            msgId = (0, encoding_1.computeMsgId)(topic, topicStr, msg);
+            msg.msgId = msgId;
         }
         return msgId;
     }
-    // Temporaly reverts https://github.com/libp2p/js-libp2p-interfaces/pull/103 while a proper fixed is done upstream
-    // await-ing _processRpc causes messages to be processed 10-20 seconds latter than when received. This kills the node
-    async _processMessages(idB58Str, stream, peerStreams) {
-        try {
-            await (0, it_pipe_1.default)(stream, async (source) => {
-                for await (const data of source) {
-                    const rpcBytes = data instanceof Uint8Array ? data : data.slice();
-                    const rpcMsg = this._decodeRpc(rpcBytes);
-                    this._processRpc(idB58Str, peerStreams, rpcMsg).catch((e) => {
-                        this.log("_processRpc error", e.stack);
-                    });
-                }
-            });
-        }
-        catch (err) {
-            this._onPeerDisconnected(peerStreams.id, err);
-        }
+    /**
+     * Get cached message id string if we have it.
+     */
+    getCachedMsgIdStr(msg) {
+        const cachedMsgId = msg.msgId;
+        return cachedMsgId ? (0, messageIdToString_1.messageIdToString)(cachedMsgId) : undefined;
     }
     // Temporaly reverts https://github.com/libp2p/js-libp2p-interfaces/pull/103 while a proper fixed is done upstream
-    // await-ing _processRpc causes messages to be processed 10-20 seconds latter than when received. This kills the node
+    // Lodestar wants to use our own queue instead of gossipsub queue introduced in https://github.com/libp2p/js-libp2p-interfaces/pull/103
     async _processRpc(idB58Str, peerStreams, rpc) {
         this.log("rpc from", idB58Str);
         const subs = rpc.subscriptions;
@@ -146,9 +136,59 @@ class Eth2Gossipsub extends libp2p_gossipsub_1.default {
         // not a direct implementation of js-libp2p-gossipsub, this is from gossipsub
         // https://github.com/ChainSafe/js-libp2p-gossipsub/blob/751ea73e9b7dc2287ca56786857d32ec2ce796b9/ts/index.ts#L366
         if (rpc.control) {
-            super._processRpcControlMessage(idB58Str, rpc.control);
+            await super._processRpcControlMessage(idB58Str, rpc.control);
         }
         return true;
+    }
+    /**
+     * Similar to gossipsub 0.13.0 except that no await
+     * TODO: override getMsgIdIfNotSeen and add metric
+     * See https://github.com/ChainSafe/js-libp2p-gossipsub/pull/187/files
+     */
+    async _processRpcMessage(msg) {
+        let canonicalMsgIdStr;
+        if (this.getFastMsgIdStr && this.fastMsgIdCache) {
+            // check duplicate
+            // change: no await needed
+            const fastMsgIdStr = this.getFastMsgIdStr(msg);
+            canonicalMsgIdStr = this.fastMsgIdCache.get(fastMsgIdStr);
+            if (canonicalMsgIdStr !== undefined) {
+                void this.score.duplicateMessage(msg, canonicalMsgIdStr);
+                return;
+            }
+            // change: no await needed
+            canonicalMsgIdStr = (0, messageIdToString_1.messageIdToString)(this.getMsgId(msg));
+            this.fastMsgIdCache.put(fastMsgIdStr, canonicalMsgIdStr);
+        }
+        else {
+            // check duplicate
+            // change: no await needed
+            canonicalMsgIdStr = (0, messageIdToString_1.messageIdToString)(this.getMsgId(msg));
+            if (this.seenCache.has(canonicalMsgIdStr)) {
+                void this.score.duplicateMessage(msg, canonicalMsgIdStr);
+                return;
+            }
+        }
+        // put in cache
+        this.seenCache.put(canonicalMsgIdStr);
+        await this.score.validateMessage(canonicalMsgIdStr);
+        // await super._processRpcMessage(msg);
+        // this is from libp2p-interface 4.0.4
+        // https://github.com/libp2p/js-libp2p-interfaces/blob/libp2p-interfaces%404.0.4/packages/interfaces/src/pubsub/index.js#L461
+        if (this.peerId.toB58String() === msg.from && !this.emitSelf) {
+            return;
+        }
+        // Ensure the message is valid before processing it
+        try {
+            await this.validate(msg);
+        }
+        catch ( /** @type {any} */err) {
+            this.log("Message is invalid, dropping it. %O", err);
+            return;
+        }
+        // Emit to self: no need as we don't do that in this child class
+        // this._emitMessage(msg);
+        return this._publish(pubsub_1.utils.normalizeOutRpcMessage(msg));
     }
     // // Snippet of _processRpcMessage from https://github.com/libp2p/js-libp2p-interfaces/blob/92245d66b0073f0a72fed9f7abcf4b533102f1fd/packages/interfaces/src/pubsub/index.js#L442
     // async _processRpcMessage(msg: InMessage): Promise<void> {
@@ -193,8 +233,9 @@ class Eth2Gossipsub extends libp2p_gossipsub_1.default {
             // JobQueue may throw non-typed errors
             const code = e instanceof errors_1.GossipValidationError ? e.code : constants_1.ERR_TOPIC_VALIDATOR_IGNORE;
             // async to compute msgId with sha256 from multiformats/hashes/sha2
-            await this.score.rejectMessage(message, code);
-            await this.gossipTracer.rejectMessage(message, code);
+            const messageId = await this.getCanonicalMsgIdStr(message);
+            await this.score.rejectMessage(message, messageId, code);
+            await this.gossipTracer.rejectMessage(messageId, code);
             throw e;
         }
     }

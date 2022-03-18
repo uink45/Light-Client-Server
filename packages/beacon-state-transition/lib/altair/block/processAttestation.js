@@ -80,7 +80,7 @@ function processAttestations(state, attestations, verifySignature = true) {
 }
 exports.processAttestations = processAttestations;
 /**
- * https://github.com/ethereum/eth2.0-specs/blob/v1.1.0-alpha.4/specs/altair/beacon-chain.md#get_attestation_participation_flag_indices
+ * https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/altair/beacon-chain.md#get_attestation_participation_flag_indices
  */
 function getAttestationParticipationStatus(data, inclusionDelay, rootCache, epochCtx) {
     const justifiedCheckpoint = data.target.epoch === epochCtx.currentShuffling.epoch

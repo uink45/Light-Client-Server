@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.validateGossipSyncCommitteeExceptSig = exports.validateSyncCommitteeSigOnly = exports.validateGossipSyncCommittee = void 0;
 const lodestar_params_1 = require("@chainsafe/lodestar-params");
-const peers_1 = require("../../network/peers");
 const errors_1 = require("../errors");
 const signatureSets_1 = require("./signatureSets");
 /**
@@ -21,7 +20,7 @@ async function validateGossipSyncCommittee(chain, syncCommittee, subnet) {
     // [IGNORE] There has been no other valid sync committee signature for the declared slot for the validator referenced
     // by sync_committee_signature.validator_index.
     if (chain.seenSyncCommitteeMessages.isKnown(slot, subnet, validatorIndex)) {
-        throw new errors_1.SyncCommitteeError(errors_1.GossipAction.IGNORE, null, {
+        throw new errors_1.SyncCommitteeError(errors_1.GossipAction.IGNORE, {
             code: errors_1.SyncCommitteeErrorCode.SYNC_COMMITTEE_ALREADY_KNOWN,
         });
     }
@@ -41,7 +40,7 @@ exports.validateGossipSyncCommittee = validateGossipSyncCommittee;
 async function validateSyncCommitteeSigOnly(chain, headState, syncCommittee) {
     const signatureSet = (0, signatureSets_1.getSyncCommitteeSignatureSet)(headState, syncCommittee);
     if (!(await chain.bls.verifySignatureSets([signatureSet], { batchable: true }))) {
-        throw new errors_1.SyncCommitteeError(errors_1.GossipAction.REJECT, peers_1.PeerAction.LowToleranceError, {
+        throw new errors_1.SyncCommitteeError(errors_1.GossipAction.REJECT, {
             code: errors_1.SyncCommitteeErrorCode.INVALID_SIGNATURE,
         });
     }
@@ -54,9 +53,8 @@ function validateGossipSyncCommitteeExceptSig(chain, headState, subnet, data) {
     const { slot, validatorIndex } = data;
     // [IGNORE] The signature's slot is for the current slot, i.e. sync_committee_signature.slot == current_slot.
     // (with a MAXIMUM_GOSSIP_CLOCK_DISPARITY allowance)
-    // don't apply any peer actions for now
     if (!chain.clock.isCurrentSlotGivenGossipDisparity(slot)) {
-        throw new errors_1.SyncCommitteeError(errors_1.GossipAction.IGNORE, null, {
+        throw new errors_1.SyncCommitteeError(errors_1.GossipAction.IGNORE, {
             code: errors_1.SyncCommitteeErrorCode.NOT_CURRENT_SLOT,
             currentSlot: chain.clock.currentSlot,
             slot,
@@ -64,7 +62,7 @@ function validateGossipSyncCommitteeExceptSig(chain, headState, subnet, data) {
     }
     // [REJECT] The subcommittee index is in the allowed range, i.e. contribution.subcommittee_index < SYNC_COMMITTEE_SUBNET_COUNT.
     if (subnet >= lodestar_params_1.SYNC_COMMITTEE_SUBNET_COUNT) {
-        throw new errors_1.SyncCommitteeError(errors_1.GossipAction.REJECT, peers_1.PeerAction.LowToleranceError, {
+        throw new errors_1.SyncCommitteeError(errors_1.GossipAction.REJECT, {
             code: errors_1.SyncCommitteeErrorCode.INVALID_SUBCOMMITTEE_INDEX,
             subcommitteeIndex: subnet,
         });
@@ -73,7 +71,7 @@ function validateGossipSyncCommitteeExceptSig(chain, headState, subnet, data) {
     // Note this validation implies the validator is part of the broader current sync committee along with the correct subcommittee.
     const indexInSubcommittee = getIndexInSubcommittee(headState, subnet, data);
     if (indexInSubcommittee === null) {
-        throw new errors_1.SyncCommitteeError(errors_1.GossipAction.REJECT, peers_1.PeerAction.LowToleranceError, {
+        throw new errors_1.SyncCommitteeError(errors_1.GossipAction.REJECT, {
             code: errors_1.SyncCommitteeErrorCode.VALIDATOR_NOT_IN_SYNC_COMMITTEE,
             validatorIndex,
         });

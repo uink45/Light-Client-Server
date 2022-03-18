@@ -32,16 +32,16 @@ const node_fs_1 = __importDefault(require("node:fs"));
 const got_1 = __importDefault(require("got"));
 const mainnet = __importStar(require("./mainnet"));
 const prater = __importStar(require("./prater"));
-const kintsugi = __importStar(require("./kintsugi"));
-exports.networkNames = ["mainnet", "prater", "kintsugi"];
+const kiln = __importStar(require("./kiln"));
+exports.networkNames = ["mainnet", "prater", "kiln"];
 function getNetworkData(network) {
     switch (network) {
         case "mainnet":
             return mainnet;
         case "prater":
             return prater;
-        case "kintsugi":
-            return kintsugi;
+        case "kiln":
+            return kiln;
         default:
             throw Error(`Network not supported: ${network}`);
     }

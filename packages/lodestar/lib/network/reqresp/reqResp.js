@@ -13,20 +13,20 @@ const request_2 = require("./request");
 const types_1 = require("./types");
 const rateLimiter_1 = require("./response/rateLimiter");
 /**
- * Implementation of eth2 p2p Req/Resp domain.
+ * Implementation of Ethereum Consensus p2p Req/Resp domain.
  * For the spec that this code is based on, see:
- * https://github.com/ethereum/eth2.0-specs/blob/dev/specs/phase0/p2p-interface.md#the-reqresp-domain
+ * https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/phase0/p2p-interface.md#the-reqresp-domain
  */
 class ReqResp {
     constructor(modules, options) {
         this.controller = new abort_controller_1.AbortController();
         this.reqCount = 0;
         this.respCount = 0;
+        this.encodingPreference = new Map();
         this.config = modules.config;
         this.libp2p = modules.libp2p;
         this.logger = modules.logger;
         this.reqRespHandlers = modules.reqRespHandlers;
-        this.peerMetadata = modules.peerMetadata;
         this.metadataController = modules.metadata;
         this.peerRpcScores = modules.peerRpcScores;
         this.inboundRateLimiter = new rateLimiter_1.InboundRateLimiter(options, { ...modules });
@@ -34,16 +34,16 @@ class ReqResp {
         this.options = options;
         this.metrics = modules.metrics;
     }
-    start() {
+    async start() {
         this.controller = new abort_controller_1.AbortController();
         for (const [method, version, encoding] of types_1.protocolsSupported) {
-            this.libp2p.handle((0, utils_1.formatProtocolId)(method, version, encoding), this.getRequestHandler({ method, version, encoding }));
+            await this.libp2p.handle((0, utils_1.formatProtocolId)(method, version, encoding), this.getRequestHandler({ method, version, encoding }));
         }
         this.inboundRateLimiter.start();
     }
-    stop() {
+    async stop() {
         for (const [method, version, encoding] of types_1.protocolsSupported) {
-            this.libp2p.unhandle((0, utils_1.formatProtocolId)(method, version, encoding));
+            await this.libp2p.unhandle((0, utils_1.formatProtocolId)(method, version, encoding));
         }
         this.controller.abort();
         this.inboundRateLimiter.stop();
@@ -72,15 +72,16 @@ class ReqResp {
         return await this.sendRequest(peerId, types_1.Method.BeaconBlocksByRoot, [types_1.Version.V2, types_1.Version.V1], // Prioritize V2
         request, request.length);
     }
-    pruneRateLimiterData(peerId) {
+    pruneOnPeerDisconnect(peerId) {
         this.inboundRateLimiter.prune(peerId);
+        this.encodingPreference.delete(peerId.toB58String());
     }
     // Helper to reduce code duplication
     async sendRequest(peerId, method, versions, body, maxResponses = 1) {
         var _a, _b, _c, _d;
         try {
             (_a = this.metrics) === null || _a === void 0 ? void 0 : _a.reqRespOutgoingRequests.inc({ method });
-            const encoding = (_b = this.peerMetadata.encoding.get(peerId)) !== null && _b !== void 0 ? _b : types_1.Encoding.SSZ_SNAPPY;
+            const encoding = (_b = this.encodingPreference.get(peerId.toB58String())) !== null && _b !== void 0 ? _b : types_1.Encoding.SSZ_SNAPPY;
             const result = await (0, request_1.sendRequest)({ forkDigestContext: this.config, logger: this.logger, libp2p: this.libp2p }, peerId, method, encoding, versions, body, maxResponses, this.controller.signal, this.options, this.reqCount++);
             return result;
         }
@@ -103,7 +104,7 @@ class ReqResp {
             // TODO: Do we really need this now that there is only one encoding?
             // Remember the prefered encoding of this peer
             if (method === types_1.Method.Status) {
-                this.peerMetadata.encoding.set(peerId, encoding);
+                this.encodingPreference.set(peerId.toB58String(), encoding);
             }
             try {
                 (_a = this.metrics) === null || _a === void 0 ? void 0 : _a.reqRespIncomingRequests.inc({ method });

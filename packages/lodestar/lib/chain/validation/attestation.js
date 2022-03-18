@@ -7,7 +7,6 @@ const lodestar_beacon_state_transition_1 = require("@chainsafe/lodestar-beacon-s
 const errors_1 = require("../errors");
 const constants_1 = require("../../constants");
 const regen_1 = require("../regen");
-const network_1 = require("../../network");
 const { getIndexedAttestationSignatureSet } = lodestar_beacon_state_transition_1.allForks;
 async function validateGossipAttestation(chain, attestation, 
 /** Optional, to allow verifying attestations through API with unknown subnet */
@@ -27,7 +26,7 @@ subnet) {
     const targetEpoch = attTarget.epoch;
     // [REJECT] The attestation's epoch matches its target -- i.e. attestation.data.target.epoch == compute_epoch_at_slot(attestation.data.slot)
     if (targetEpoch !== attEpoch) {
-        throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, network_1.PeerAction.LowToleranceError, {
+        throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, {
             code: errors_1.AttestationErrorCode.BAD_TARGET_EPOCH,
         });
     }
@@ -45,9 +44,7 @@ subnet) {
     }
     catch (e) {
         if (e instanceof lodestar_beacon_state_transition_1.AggregationBitsError && e.type.code === lodestar_beacon_state_transition_1.AggregationBitsErrorCode.NOT_EXACTLY_ONE_BIT_SET) {
-            throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, network_1.PeerAction.LowToleranceError, {
-                code: errors_1.AttestationErrorCode.NOT_EXACTLY_ONE_AGGREGATION_BIT_SET,
-            });
+            throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, { code: errors_1.AttestationErrorCode.NOT_EXACTLY_ONE_AGGREGATION_BIT_SET });
         }
         else {
             throw e;
@@ -71,7 +68,7 @@ subnet) {
     const attHeadState = await chain.regen
         .getState(attHeadBlock.stateRoot, regen_1.RegenCaller.validateGossipAttestation)
         .catch((e) => {
-        throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, null, {
+        throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, {
             code: errors_1.AttestationErrorCode.MISSING_ATTESTATION_HEAD_STATE,
             error: e,
         });
@@ -85,9 +82,7 @@ subnet) {
     // -- i.e. len(attestation.aggregation_bits) == len(get_beacon_committee(state, data.slot, data.index)).
     // > TODO: Is this necessary? Lighthouse does not do this check
     if (aggregationBits.length !== committeeIndices.length) {
-        throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, network_1.PeerAction.LowToleranceError, {
-            code: errors_1.AttestationErrorCode.WRONG_NUMBER_OF_AGGREGATION_BITS,
-        });
+        throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, { code: errors_1.AttestationErrorCode.WRONG_NUMBER_OF_AGGREGATION_BITS });
     }
     // LH > verify_middle_checks
     // Run the checks that apply to the indexed attestation before the signature is checked.
@@ -99,7 +94,7 @@ subnet) {
     // which may be pre-computed along with the committee information for the signature check.
     const expectedSubnet = computeSubnetForSlot(attHeadState, attSlot, attIndex);
     if (subnet !== null && subnet !== expectedSubnet) {
-        throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, network_1.PeerAction.LowToleranceError, {
+        throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, {
             code: errors_1.AttestationErrorCode.INVALID_SUBNET_ID,
             received: subnet,
             expected: expectedSubnet,
@@ -108,7 +103,7 @@ subnet) {
     // [IGNORE] There has been no other valid attestation seen on an attestation subnet that has an
     // identical attestation.data.target.epoch and participating validator index.
     if (chain.seenAttesters.isKnown(targetEpoch, validatorIndex)) {
-        throw new errors_1.AttestationError(errors_1.GossipAction.IGNORE, null, {
+        throw new errors_1.AttestationError(errors_1.GossipAction.IGNORE, {
             code: errors_1.AttestationErrorCode.ATTESTATION_ALREADY_KNOWN,
             targetEpoch,
             validatorIndex,
@@ -122,9 +117,7 @@ subnet) {
     };
     const signatureSet = getIndexedAttestationSignatureSet(attHeadState, indexedAttestation);
     if (!(await chain.bls.verifySignatureSets([signatureSet], { batchable: true }))) {
-        throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, network_1.PeerAction.LowToleranceError, {
-            code: errors_1.AttestationErrorCode.INVALID_SIGNATURE,
-        });
+        throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, { code: errors_1.AttestationErrorCode.INVALID_SIGNATURE });
     }
     // Now that the attestation has been fully verified, store that we have received a valid attestation from this validator.
     //
@@ -132,7 +125,7 @@ subnet) {
     // there can be a race-condition if we receive two attestations at the same time and
     // process them in different threads.
     if (chain.seenAttesters.isKnown(targetEpoch, validatorIndex)) {
-        throw new errors_1.AttestationError(errors_1.GossipAction.IGNORE, null, {
+        throw new errors_1.AttestationError(errors_1.GossipAction.IGNORE, {
             code: errors_1.AttestationErrorCode.ATTESTATION_ALREADY_KNOWN,
             targetEpoch,
             validatorIndex,
@@ -157,14 +150,14 @@ function verifyPropagationSlotRange(chain, attestationSlot) {
     // ATTESTATION_PROPAGATION_SLOT_RANGE = SLOTS_PER_EPOCH
     chain.clock.slotWithPastTolerance(constants_1.MAXIMUM_GOSSIP_CLOCK_DISPARITY_SEC) - lodestar_params_1.SLOTS_PER_EPOCH, 0);
     if (attestationSlot < earliestPermissibleSlot) {
-        throw new errors_1.AttestationError(errors_1.GossipAction.IGNORE, network_1.PeerAction.LowToleranceError, {
+        throw new errors_1.AttestationError(errors_1.GossipAction.IGNORE, {
             code: errors_1.AttestationErrorCode.PAST_SLOT,
             earliestPermissibleSlot,
             attestationSlot,
         });
     }
     if (attestationSlot > latestPermissibleSlot) {
-        throw new errors_1.AttestationError(errors_1.GossipAction.IGNORE, network_1.PeerAction.LowToleranceError, {
+        throw new errors_1.AttestationError(errors_1.GossipAction.IGNORE, {
             code: errors_1.AttestationErrorCode.FUTURE_SLOT,
             latestPermissibleSlot,
             attestationSlot,
@@ -199,7 +192,7 @@ function verifyHeadBlockIsKnown(chain, beaconBlockRoot) {
     // TODO (LH): Enforce a maximum skip distance for unaggregated attestations.
     const headBlock = chain.forkChoice.getBlock(beaconBlockRoot);
     if (headBlock === null) {
-        throw new errors_1.AttestationError(errors_1.GossipAction.IGNORE, null, {
+        throw new errors_1.AttestationError(errors_1.GossipAction.IGNORE, {
             code: errors_1.AttestationErrorCode.UNKNOWN_BEACON_BLOCK_ROOT,
             root: (0, ssz_1.toHexString)(beaconBlockRoot.valueOf()),
         });
@@ -223,8 +216,8 @@ function verifyAttestationTargetRoot(headBlock, targetRoot, attestationEpoch) {
         // invalid in the spirit of the protocol. Here we choose safety over profit.
         //
         // Reference:
-        // https://github.com/ethereum/eth2.0-specs/pull/2001#issuecomment-699246659
-        throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, network_1.PeerAction.LowToleranceError, {
+        // https://github.com/ethereum/consensus-specs/pull/2001#issuecomment-699246659
+        throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, {
             code: errors_1.AttestationErrorCode.INVALID_TARGET_ROOT,
             targetRoot: (0, ssz_1.toHexString)(targetRoot),
             expected: null,
@@ -243,7 +236,7 @@ function verifyAttestationTargetRoot(headBlock, targetRoot, attestationEpoch) {
         // TODO: Do a fast comparision to convert and compare byte by byte
         if (expectedTargetRoot !== (0, ssz_1.toHexString)(targetRoot)) {
             // Reject any attestation with an invalid target root.
-            throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, network_1.PeerAction.LowToleranceError, {
+            throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, {
                 code: errors_1.AttestationErrorCode.INVALID_TARGET_ROOT,
                 targetRoot: (0, ssz_1.toHexString)(targetRoot),
                 expected: expectedTargetRoot,
@@ -255,7 +248,7 @@ function getCommitteeIndices(attestationTargetState, attestationSlot, attestatio
     const { committees } = attestationTargetState.getShufflingAtSlot(attestationSlot);
     const slotCommittees = committees[attestationSlot % lodestar_params_1.SLOTS_PER_EPOCH];
     if (attestationIndex >= slotCommittees.length) {
-        throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, network_1.PeerAction.LowToleranceError, {
+        throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, {
             code: errors_1.AttestationErrorCode.COMMITTEE_INDEX_OUT_OF_RANGE,
             index: attestationIndex,
         });

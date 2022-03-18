@@ -6,7 +6,6 @@ const signatureSets_1 = require("./signatureSets");
 const errors_1 = require("../errors");
 const attestation_1 = require("./attestation");
 const regen_1 = require("../regen");
-const peers_1 = require("../../network/peers");
 async function validateGossipAggregateAndProof(chain, signedAggregateAndProof) {
     // Do checks in this order:
     // - do early checks (w/o indexed attestation)
@@ -23,9 +22,7 @@ async function validateGossipAggregateAndProof(chain, signedAggregateAndProof) {
     const targetEpoch = attTarget.epoch;
     // [REJECT] The attestation's epoch matches its target -- i.e. attestation.data.target.epoch == compute_epoch_at_slot(attestation.data.slot)
     if (targetEpoch !== attEpoch) {
-        throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, peers_1.PeerAction.LowToleranceError, {
-            code: errors_1.AttestationErrorCode.BAD_TARGET_EPOCH,
-        });
+        throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, { code: errors_1.AttestationErrorCode.BAD_TARGET_EPOCH });
     }
     // [IGNORE] aggregate.data.slot is within the last ATTESTATION_PROPAGATION_SLOT_RANGE slots (with a MAXIMUM_GOSSIP_CLOCK_DISPARITY allowance)
     // -- i.e. aggregate.data.slot + ATTESTATION_PROPAGATION_SLOT_RANGE >= current_slot >= aggregate.data.slot
@@ -35,7 +32,7 @@ async function validateGossipAggregateAndProof(chain, signedAggregateAndProof) {
     // index aggregate_and_proof.aggregator_index for the epoch aggregate.data.target.epoch.
     const aggregatorIndex = aggregateAndProof.aggregatorIndex;
     if (chain.seenAggregators.isKnown(targetEpoch, aggregatorIndex)) {
-        throw new errors_1.AttestationError(errors_1.GossipAction.IGNORE, null, {
+        throw new errors_1.AttestationError(errors_1.GossipAction.IGNORE, {
             code: errors_1.AttestationErrorCode.AGGREGATOR_ALREADY_KNOWN,
             targetEpoch,
             aggregatorIndex,
@@ -50,7 +47,7 @@ async function validateGossipAggregateAndProof(chain, signedAggregateAndProof) {
     const attHeadState = await chain.regen
         .getState(attHeadBlock.stateRoot, regen_1.RegenCaller.validateGossipAggregateAndProof)
         .catch((e) => {
-        throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, null, {
+        throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, {
             code: errors_1.AttestationErrorCode.MISSING_ATTESTATION_HEAD_STATE,
             error: e,
         });
@@ -67,23 +64,17 @@ async function validateGossipAggregateAndProof(chain, signedAggregateAndProof) {
     // len(get_attesting_indices(state, aggregate.data, aggregate.aggregation_bits)) >= 1.
     if (attestingIndices.length < 1) {
         // missing attestation participants
-        throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, peers_1.PeerAction.LowToleranceError, {
-            code: errors_1.AttestationErrorCode.EMPTY_AGGREGATION_BITFIELD,
-        });
+        throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, { code: errors_1.AttestationErrorCode.EMPTY_AGGREGATION_BITFIELD });
     }
     // [REJECT] aggregate_and_proof.selection_proof selects the validator as an aggregator for the slot
     // -- i.e. is_aggregator(state, aggregate.data.slot, aggregate.data.index, aggregate_and_proof.selection_proof) returns True.
     if (!(0, lodestar_beacon_state_transition_1.isAggregatorFromCommitteeLength)(committeeIndices.length, aggregateAndProof.selectionProof)) {
-        throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, peers_1.PeerAction.LowToleranceError, {
-            code: errors_1.AttestationErrorCode.INVALID_AGGREGATOR,
-        });
+        throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, { code: errors_1.AttestationErrorCode.INVALID_AGGREGATOR });
     }
     // [REJECT] The aggregator's validator index is within the committee
     // -- i.e. aggregate_and_proof.aggregator_index in get_beacon_committee(state, aggregate.data.slot, aggregate.data.index).
     if (!committeeIndices.includes(aggregateAndProof.aggregatorIndex)) {
-        throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, peers_1.PeerAction.LowToleranceError, {
-            code: errors_1.AttestationErrorCode.AGGREGATOR_NOT_IN_COMMITTEE,
-        });
+        throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, { code: errors_1.AttestationErrorCode.AGGREGATOR_NOT_IN_COMMITTEE });
     }
     // [REJECT] The aggregate_and_proof.selection_proof is a valid signature of the aggregate.data.slot
     // by the validator with index aggregate_and_proof.aggregator_index.
@@ -96,15 +87,13 @@ async function validateGossipAggregateAndProof(chain, signedAggregateAndProof) {
         lodestar_beacon_state_transition_1.allForks.getIndexedAttestationSignatureSet(attHeadState, indexedAttestation),
     ];
     if (!(await chain.bls.verifySignatureSets(signatureSets, { batchable: true }))) {
-        throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, peers_1.PeerAction.LowToleranceError, {
-            code: errors_1.AttestationErrorCode.INVALID_SIGNATURE,
-        });
+        throw new errors_1.AttestationError(errors_1.GossipAction.REJECT, { code: errors_1.AttestationErrorCode.INVALID_SIGNATURE });
     }
     // It's important to double check that the attestation still hasn't been observed, since
     // there can be a race-condition if we receive two attestations at the same time and
     // process them in different threads.
     if (chain.seenAggregators.isKnown(targetEpoch, aggregatorIndex)) {
-        throw new errors_1.AttestationError(errors_1.GossipAction.IGNORE, null, {
+        throw new errors_1.AttestationError(errors_1.GossipAction.IGNORE, {
             code: errors_1.AttestationErrorCode.AGGREGATOR_ALREADY_KNOWN,
             targetEpoch,
             aggregatorIndex,

@@ -4,7 +4,7 @@ import { allForks } from "@chainsafe/lodestar-types";
 import { Checkpoint } from "@chainsafe/lodestar-types/phase0";
 import { RecursivePartial } from "@chainsafe/lodestar-utils";
 import { TreeBacked } from "@chainsafe/ssz";
-export declare type NetworkName = "mainnet" | "prater" | "kintsugi" | "dev";
+export declare type NetworkName = "mainnet" | "prater" | "kiln" | "dev";
 export declare const networkNames: NetworkName[];
 export declare type WeakSubjectivityFetchOptions = {
     weakSubjectivityServerUrl: string;

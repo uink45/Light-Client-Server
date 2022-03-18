@@ -11,9 +11,9 @@ const errors_1 = require("./errors");
 const store_1 = require("./store");
 /* eslint-disable max-len */
 /**
- * Provides an implementation of "Ethereum 2.0 Phase 0 -- Beacon Chain Fork Choice":
+ * Provides an implementation of "Ethereum Consensus -- Beacon Chain Fork Choice":
  *
- * https://github.com/ethereum/eth2.0-specs/blob/v0.12.2/specs/phase0/fork-choice.md#ethereum-20-phase-0----beacon-chain-fork-choice
+ * https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/phase0/fork-choice.md#fork-choice
  *
  * ## Detail
  *
@@ -83,7 +83,7 @@ class ForkChoice {
      *
      * Equivalent to:
      *
-     * https://github.com/ethereum/eth2.0-specs/blob/v0.12.1/specs/phase0/fork-choice.md#get_ancestor
+     * https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/phase0/fork-choice.md#get_ancestor
      */
     getAncestor(blockRoot, ancestorSlot) {
         const block = this.protoArray.getBlock(blockRoot);
@@ -141,7 +141,7 @@ class ForkChoice {
      *
      * Is equivalent to:
      *
-     * https://github.com/ethereum/eth2.0-specs/blob/v0.12.2/specs/phase0/fork-choice.md#get_head
+     * https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/phase0/fork-choice.md#get_head
      */
     updateHead() {
         // balances is not changed but votes are changed
@@ -223,7 +223,7 @@ class ForkChoice {
      *
      * Approximates:
      *
-     * https://github.com/ethereum/eth2.0-specs/blob/v0.12.1/specs/phase0/fork-choice.md#on_block
+     * https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/phase0/fork-choice.md#on_block
      *
      * It only approximates the specification since it does not run the `state_transition` check.
      * That should have already been called upstream and it's too expensive to call again.
@@ -376,7 +376,7 @@ class ForkChoice {
      *
      * Approximates:
      *
-     * https://github.com/ethereum/eth2.0-specs/blob/v0.12.1/specs/phase0/fork-choice.md#on_attestation
+     * https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/phase0/fork-choice.md#on_attestation
      *
      * It only approximates the specification since it does not perform
      * `is_valid_indexed_attestation` since that should already have been called upstream and it's
@@ -640,7 +640,7 @@ class ForkChoice {
      *
      * Is equivalent to:
      *
-     * https://github.com/ethereum/eth2.0-specs/blob/v0.12.1/specs/phase0/fork-choice.md#should_update_justified_checkpoint
+     * https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/phase0/fork-choice.md#should_update_justified_checkpoint
      */
     shouldUpdateJustifiedCheckpoint(state) {
         const { slot, currentJustifiedCheckpoint } = state;
@@ -682,7 +682,7 @@ class ForkChoice {
      *
      * Equivalent to:
      *
-     * https://github.com/ethereum/eth2.0-specs/blob/v0.12.1/specs/phase0/fork-choice.md#validate_on_attestation
+     * https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/phase0/fork-choice.md#validate_on_attestation
      */
     validateOnAttestation(indexedAttestation, slot, blockRootHex, targetEpoch) {
         // There is no point in processing an attestation with an empty bitfield. Reject
@@ -846,7 +846,7 @@ class ForkChoice {
      *
      * Equivalent to:
      *
-     * https://github.com/ethereum/eth2.0-specs/blob/v0.12.1/specs/phase0/fork-choice.md#on_tick
+     * https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/phase0/fork-choice.md#on_tick
      */
     onTick(time) {
         const previousSlot = this.fcStore.currentSlot;

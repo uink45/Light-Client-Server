@@ -10,7 +10,7 @@ export declare type BeaconCommitteeSubscription = {
     isAggregator: boolean;
 };
 /**
- * From https://github.com/ethereum/eth2.0-APIs/pull/136
+ * From https://github.com/ethereum/beacon-APIs/pull/136
  */
 export declare type SyncCommitteeSubscription = {
     validatorIndex: ValidatorIndex;
@@ -32,7 +32,7 @@ export declare type AttesterDuty = {
     slot: Slot;
 };
 /**
- * From https://github.com/ethereum/eth2.0-APIs/pull/134
+ * From https://github.com/ethereum/beacon-APIs/pull/134
  */
 export declare type SyncDuty = {
     pubkey: BLSPubkey;

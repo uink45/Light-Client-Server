@@ -65,13 +65,13 @@ function prettyPrintPeerId(peerId) {
     return `${id.substr(0, 2)}...${id.substr(id.length - 6, id.length)}`;
 }
 exports.prettyPrintPeerId = prettyPrintPeerId;
-function getClientFromPeerStore(peerId, metadataBook) {
-    const agentVersion = getAgentVersionFromPeerStore(peerId, metadataBook);
+async function getClientFromPeerStore(peerId, metadataBook) {
+    const agentVersion = await getAgentVersionFromPeerStore(peerId, metadataBook);
     return (0, client_1.clientFromAgentVersion)(agentVersion);
 }
 exports.getClientFromPeerStore = getClientFromPeerStore;
-function getAgentVersionFromPeerStore(peerId, metadataBook) {
-    return new TextDecoder().decode(metadataBook.getValue(peerId, "AgentVersion")) || "N/A";
+async function getAgentVersionFromPeerStore(peerId, metadataBook) {
+    return new TextDecoder().decode(await metadataBook.getValue(peerId, "AgentVersion")) || "N/A";
 }
 exports.getAgentVersionFromPeerStore = getAgentVersionFromPeerStore;
 //# sourceMappingURL=util.js.map

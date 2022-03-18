@@ -11,7 +11,7 @@ const globalSingleOptions = {
         type: "string",
     },
     network: {
-        description: "Name of the Eth2 chain network to join",
+        description: "Name of the Ethereum Consensus chain network to join",
         type: "string",
         default: exports.defaultNetwork,
         choices: networks_1.networkNames,

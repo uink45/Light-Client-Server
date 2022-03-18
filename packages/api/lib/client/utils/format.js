@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.urlJoin = exports.stringifyQuery = void 0;
 const qs_1 = __importDefault(require("qs"));
 /**
- * Eth2.0 API requires the query with format:
+ * Ethereum Beacon API requires the query with format:
  * - arrayFormat: repeat `topic=topic1&topic=topic2`
  */
 function stringifyQuery(query) {

@@ -2,16 +2,13 @@
 /**
  * @module network/nodejs
  */
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createNodeJsLibp2p = void 0;
 const bundle_1 = require("./bundle");
 const options_1 = require("../options");
 const __1 = require("..");
 const discv5_1 = require("@chainsafe/discv5");
-const datastore_level_1 = __importDefault(require("datastore-level"));
+const datastore_1 = require("../peers/datastore");
 /**
  *
  * @param peerIdOrPromise Create an instance of NodejsNode asynchronously
@@ -37,7 +34,7 @@ async function createNodeJsLibp2p(peerIdOrPromise, networkOpts = {}, nodeJsLibp2
     }
     let datastore = undefined;
     if (peerStoreDir) {
-        datastore = new datastore_level_1.default(peerStoreDir);
+        datastore = new datastore_1.Eth2PeerDataStore(peerStoreDir);
         await datastore.open();
     }
     // Append discv5.bootEnrs to bootMultiaddrs if requested

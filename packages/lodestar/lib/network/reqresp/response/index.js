@@ -24,7 +24,7 @@ Object.defineProperty(exports, "ResponseError", { enumerable: true, get: functio
  * 4b. On error, encode and write an error `<response_chunk>` and stop
  */
 async function handleRequest({ config, logger, libp2p }, performRequestHandler, stream, peerId, protocol, signal, requestId = 0) {
-    const client = (0, util_1.getClientFromPeerStore)(peerId, libp2p.peerStore.metadataBook);
+    const client = await (0, util_1.getClientFromPeerStore)(peerId, libp2p.peerStore.metadataBook);
     const logCtx = { method: protocol.method, client, peer: (0, util_1.prettyPrintPeerId)(peerId), requestId };
     let responseError = null;
     await (0, it_pipe_1.default)(

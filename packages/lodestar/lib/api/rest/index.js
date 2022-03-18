@@ -17,7 +17,7 @@ exports.restApiOptionsDefault = {
     // ApiNamespace "debug" is not turned on by default
     api: ["beacon", "lightclient"],
     host: "127.0.0.1",
-    port: 9596,
+    port: 9000,
     cors: "*",
 };
 /**

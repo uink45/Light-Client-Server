@@ -87,6 +87,7 @@ class PeerManager {
                     relevantStatus: RelevantPeerStatus.Unknown,
                     direction,
                     peerId: peer,
+                    metadata: null,
                 });
                 if (direction === "outbound") {
                     this.pingAndStatusTimeouts();
@@ -107,7 +108,7 @@ class PeerManager {
             this.connectedPeers.delete(peer.toB58String());
             this.logger.verbose("peer disconnected", { peer: (0, util_1.prettyPrintPeerId)(peer), direction, status });
             this.networkEventBus.emit(events_1.NetworkEvent.peerDisconnected, peer);
-            this.reqResp.pruneRateLimiterData(peer);
+            this.reqResp.pruneOnPeerDisconnect(peer);
             (_a = this.metrics) === null || _a === void 0 ? void 0 : _a.peerDisconnectedEvent.inc({ direction });
         };
         this.libp2p = modules.libp2p;
@@ -118,7 +119,6 @@ class PeerManager {
         this.syncnetsService = modules.syncnetsService;
         this.chain = modules.chain;
         this.config = modules.config;
-        this.peerMetadata = modules.peerMetadata;
         this.peerRpcScores = modules.peerRpcScores;
         this.networkEventBus = modules.networkEventBus;
         this.opts = opts;
@@ -201,8 +201,9 @@ class PeerManager {
      * Handle a PING request + response (rpc handler responds with PONG automatically)
      */
     onPing(peer, seqNumber) {
+        var _a;
         // if the sequence number is unknown update the peer's metadata
-        const metadata = this.peerMetadata.metadata.get(peer);
+        const metadata = (_a = this.connectedPeers.get(peer.toB58String())) === null || _a === void 0 ? void 0 : _a.metadata;
         if (!metadata || metadata.seqNumber < seqNumber) {
             void this.requestMetadata(peer);
         }
@@ -213,10 +214,14 @@ class PeerManager {
     onMetadata(peer, metadata) {
         // Store metadata always in case the peer updates attnets but not the sequence number
         // Trust that the peer always sends the latest metadata (From Lighthouse)
-        this.peerMetadata.metadata.set(peer, {
-            ...metadata,
-            syncnets: metadata.syncnets || [],
-        });
+        const peerData = this.connectedPeers.get(peer.toB58String());
+        if (peerData) {
+            peerData.metadata = {
+                seqNumber: metadata.seqNumber,
+                attnets: metadata.attnets,
+                syncnets: metadata.syncnets || [],
+            };
+        }
     }
     /**
      * Handle a GOODBYE request (rpc handler responds automatically)
@@ -281,6 +286,10 @@ class PeerManager {
     async requestPing(peer) {
         try {
             this.onPing(peer, await this.reqResp.ping(peer));
+            // If peer replies a PING request also update lastReceivedMsg
+            const peerData = this.connectedPeers.get(peer.toB58String());
+            if (peerData)
+                peerData.lastReceivedMsgUnixTsMs = Date.now();
         }
         catch (e) {
             // TODO: Downvote peer here or in the reqResp layer
@@ -311,11 +320,11 @@ class PeerManager {
     heartbeat() {
         var _a, _b, _c, _d;
         const connectedPeers = this.getConnectedPeerIds();
+        // Decay scores before reading them. Also prunes scores
+        this.peerRpcScores.update();
         // ban and disconnect peers with bad score, collect rest of healthy peers
         const connectedHealthyPeers = [];
         for (const peer of connectedPeers) {
-            // to decay score
-            this.peerRpcScores.update(peer);
             switch (this.peerRpcScores.getScoreState(peer)) {
                 case score_1.ScoreState.Banned:
                     void this.goodbyeAndDisconnect(peer, constants_1.GoodByeReasonCode.BANNED);
@@ -329,12 +338,13 @@ class PeerManager {
         }
         const { peersToDisconnect, peersToConnect, attnetQueries, syncnetQueries } = (0, utils_1.prioritizePeers)(connectedHealthyPeers.map((peer) => {
             var _a, _b, _c, _d;
-            return ({
+            const peerData = this.connectedPeers.get(peer.toB58String());
+            return {
                 id: peer,
-                attnets: (_b = (_a = this.peerMetadata.metadata.get(peer)) === null || _a === void 0 ? void 0 : _a.attnets) !== null && _b !== void 0 ? _b : [],
-                syncnets: (_d = (_c = this.peerMetadata.metadata.get(peer)) === null || _c === void 0 ? void 0 : _c.syncnets) !== null && _d !== void 0 ? _d : [],
+                attnets: (_b = (_a = peerData === null || peerData === void 0 ? void 0 : peerData.metadata) === null || _a === void 0 ? void 0 : _a.attnets) !== null && _b !== void 0 ? _b : [],
+                syncnets: (_d = (_c = peerData === null || peerData === void 0 ? void 0 : peerData.metadata) === null || _c === void 0 ? void 0 : _c.syncnets) !== null && _d !== void 0 ? _d : [],
                 score: this.peerRpcScores.getScore(peer),
-            });
+            };
         }), 
         // Collect subnets which we need peers for in the current slot
         this.attnetsService.getActiveSubnets(), this.syncnetsService.getActiveSubnets(), this.opts);
@@ -371,6 +381,17 @@ class PeerManager {
         }
         for (const peer of peersToDisconnect) {
             void this.goodbyeAndDisconnect(peer, constants_1.GoodByeReasonCode.TOO_MANY_PEERS);
+        }
+        // Prune connectedPeers map in case it leaks. It has happen in previous nodes,
+        // disconnect is not always called for all peers
+        if (this.connectedPeers.size > connectedPeers.length * 2) {
+            const actualConnectedPeerIds = new Set(connectedPeers.map((peerId) => peerId.toB58String()));
+            for (const [peerIdStr, peerData] of this.connectedPeers) {
+                if (!actualConnectedPeerIds.has(peerIdStr)) {
+                    this.connectedPeers.delete(peerIdStr);
+                    this.reqResp.pruneOnPeerDisconnect(peerData.peerId);
+                }
+            }
         }
     }
     pingAndStatusTimeouts() {
@@ -418,7 +439,7 @@ class PeerManager {
         }
     }
     /** Register peer count metrics */
-    runPeerCountMetrics(metrics) {
+    async runPeerCountMetrics(metrics) {
         var _a, _b;
         let total = 0;
         const peersByDirection = new Map();
@@ -428,7 +449,7 @@ class PeerManager {
             if (openCnx) {
                 const direction = openCnx.stat.direction;
                 peersByDirection.set(direction, 1 + ((_a = peersByDirection.get(direction)) !== null && _a !== void 0 ? _a : 0));
-                const client = (0, util_1.getClientFromPeerStore)(openCnx.remotePeer, this.libp2p.peerStore.metadataBook);
+                const client = await (0, util_1.getClientFromPeerStore)(openCnx.remotePeer, this.libp2p.peerStore.metadataBook);
                 peersByClient.set(client, 1 + ((_b = peersByClient.get(client)) !== null && _b !== void 0 ? _b : 0));
                 total++;
             }

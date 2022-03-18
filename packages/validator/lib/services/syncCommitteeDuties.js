@@ -65,7 +65,7 @@ class SyncCommitteeDutiesService {
      * Note: The range of slots a validator has to perform duties is off by one.
      * The previous slot wording means that if your validator is in a sync committee for a period that runs from slot
      * 100 to 200,then you would actually produce signatures in slot 99 - 199.
-     * https://github.com/ethereum/eth2.0-specs/pull/2400
+     * https://github.com/ethereum/consensus-specs/pull/2400
      */
     async getDutiesAtSlot(slot) {
         const period = (0, lodestar_beacon_state_transition_1.computeSyncPeriodAtSlot)(slot + 1); // See note above for the +1 offset

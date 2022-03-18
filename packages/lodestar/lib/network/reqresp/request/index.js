@@ -31,7 +31,7 @@ Object.defineProperty(exports, "RequestErrorCode", { enumerable: true, get: func
 async function sendRequest({ logger, forkDigestContext, libp2p }, peerId, method, encoding, versions, requestBody, maxResponses, signal, options, requestId = 0) {
     const { REQUEST_TIMEOUT, DIAL_TIMEOUT } = { ...constants_1.timeoutOptions, ...options };
     const peer = (0, util_1.prettyPrintPeerId)(peerId);
-    const client = (0, util_1.getClientFromPeerStore)(peerId, libp2p.peerStore.metadataBook);
+    const client = await (0, util_1.getClientFromPeerStore)(peerId, libp2p.peerStore.metadataBook);
     const logCtx = { method, encoding, client, peer, requestId };
     if (signal === null || signal === void 0 ? void 0 : signal.aborted) {
         throw new lodestar_utils_1.ErrorAborted("sendRequest");

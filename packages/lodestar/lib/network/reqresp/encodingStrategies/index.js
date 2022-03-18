@@ -4,8 +4,8 @@ exports.writeEncodedPayload = exports.readEncodedPayload = void 0;
 const types_1 = require("../types");
 const decode_1 = require("./sszSnappy/decode");
 const encode_1 = require("./sszSnappy/encode");
-// For more info about eth2 request/response encoding strategies, see:
-// https://github.com/ethereum/eth2.0-specs/blob/dev/specs/phase0/p2p-interface.md#encoding-strategies
+// For more info about Ethereum Consensus request/response encoding strategies, see:
+// https://github.com/ethereum/consensus-specs/blob/v1.1.10/specs/phase0/p2p-interface.md#encoding-strategies
 // Supported encoding strategies:
 // - ssz_snappy
 /**

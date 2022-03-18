@@ -8,10 +8,9 @@ var GossipAction;
     GossipAction["REJECT"] = "REJECT";
 })(GossipAction = exports.GossipAction || (exports.GossipAction = {}));
 class GossipActionError extends lodestar_utils_1.LodestarError {
-    constructor(action, lodestarAction, type) {
+    constructor(action, type) {
         super(type);
         this.action = action;
-        this.lodestarAction = lodestarAction;
     }
 }
 exports.GossipActionError = GossipActionError;
